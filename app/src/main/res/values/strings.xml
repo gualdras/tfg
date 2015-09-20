@@ -3,4 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="settings_tab">Settings</string>
+    <string name="recent_chats_tab">Chats</string>
+    <string name="contacts_tab">Contacts</string>
 </resources>
