@@ -6,4 +6,5 @@
     <string name="settings_tab">Settings</string>
     <string name="recent_chats_tab">Chats</string>
     <string name="contacts_tab">Contacts</string>
+    <string name="send">Send</string>
 </resources>

@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ChatActivity"
+            android:label=""
+            android:windowSoftInputMode="stateHidden">
+    </activity>
     </application>
 
 </manifest>

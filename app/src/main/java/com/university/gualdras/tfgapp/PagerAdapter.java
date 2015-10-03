@@ -20,11 +20,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
         switch (position) {
             case 0:
-                return new TabConfiguration();
+                return new ConfigurationTab();
             case 1:
-                return new TabRecentChat();
+                return new RecentChatTab();
             case 2:
-                return new TabContact();
+                return new ContactTab();
             default:
                 return null;
         }

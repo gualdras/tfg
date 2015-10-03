@@ -9,10 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TabConfiguration extends Fragment {
+public class RecentChatTab extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.tab_fragment_configuration, container, false);
+        return inflater.inflate(R.layout.tab_fragment_recent_chat, container, false);
     }
 }
