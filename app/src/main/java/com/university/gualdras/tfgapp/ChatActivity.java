@@ -47,7 +47,6 @@ public class ChatActivity extends AppCompatActivity implements Constants{
         editTextWriteMessage = (EditText) findViewById(R.id.et_write_message);
         editTextWriteMessage.setOnEditorActionListener(mEditTextWriteListener);
 
-
         profilePhoto = (CircleImageView) findViewById(R.id.photo_chat_profile);
         contactName = (TextView) findViewById(R.id.contact_name);
 
