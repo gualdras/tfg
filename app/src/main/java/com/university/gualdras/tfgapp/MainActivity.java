@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
         viewPager.setCurrentItem(1);
 
+        /*
         //gcm stuff
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -98,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
+        */
     }
 
     // TODO - Check for google play services apk
