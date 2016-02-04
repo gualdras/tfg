@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.university.gualdras.tfgapp.R;
 
 /**
  * Created by gualdras on 12/10/15.

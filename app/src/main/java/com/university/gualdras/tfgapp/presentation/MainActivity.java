@@ -1,15 +1,11 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation;
 
 
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -18,12 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.university.gualdras.tfgapp.ContactItem;
+import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.gcm.QuickstartPreferences;
-import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
+import com.university.gualdras.tfgapp.presentation.contactsTab.ContactListAdapter;
 
 
 public class MainActivity extends AppCompatActivity {

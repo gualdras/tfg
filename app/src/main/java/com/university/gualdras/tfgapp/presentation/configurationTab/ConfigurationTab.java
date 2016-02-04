@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.configurationTab;
 
 /**
  * Created by gualdras on 19/09/15.
@@ -9,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class RecentChatTab extends Fragment {
+import com.university.gualdras.tfgapp.R;
+
+public class ConfigurationTab extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.tab_fragment_recent_chat, container, false);
+        return inflater.inflate(R.layout.tab_fragment_configuration, container, false);
     }
 }

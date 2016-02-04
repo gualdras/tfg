@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.chat;
 
 /**
  * Created by gualdras on 12/10/15.

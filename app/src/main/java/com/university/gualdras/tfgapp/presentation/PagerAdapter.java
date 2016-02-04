@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation;
 
 /**
  * Created by gualdras on 19/09/15.
@@ -6,6 +6,10 @@ package com.university.gualdras.tfgapp;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+
+import com.university.gualdras.tfgapp.presentation.configurationTab.ConfigurationTab;
+import com.university.gualdras.tfgapp.presentation.contactsTab.ContactTab;
+import com.university.gualdras.tfgapp.presentation.recentChatTab.RecentChatTab;
 
 public class PagerAdapter extends FragmentPagerAdapter {
     int mNumOfTabs;

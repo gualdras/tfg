@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.contactsTab;
 
 /**
  * Created by gualdras on 19/09/15.
@@ -14,7 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ContactTab extends ListFragment implements Constants{
+import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.ContactItem;
+import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
+
+public class ContactTab extends ListFragment implements Constants {
 
     private Context mContext;
     private ContactListAdapter contactListAdapter;

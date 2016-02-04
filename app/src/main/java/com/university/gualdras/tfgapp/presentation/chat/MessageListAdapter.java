@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.content.Context;
 import android.view.LayoutInflater;

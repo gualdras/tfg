@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
+import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.presentation.chat.OptionsSelectionListener;
 
 /**
  * Created by gualdras on 12/10/15.
@@ -54,12 +57,11 @@ public class WritableOptionsFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            // Set the ListSelectionListener for communicating with the QuoteViewerActivity
             mListener = (OptionsSelectionListener) activity;
 
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnArticleSelectedListener");
+                    + " must implement OptionSelectionListener");
         }
     }
 }

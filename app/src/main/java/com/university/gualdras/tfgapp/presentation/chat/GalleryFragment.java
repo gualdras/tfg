@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -32,6 +32,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.AdapterView.OnItemClickListener;
+
+import com.university.gualdras.tfgapp.R;
+
 /**
  * Created by gualdras on 13/10/15.
  */
