@@ -2,6 +2,7 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,18 @@ public class WritableOptionsFragment extends Fragment {
 
     private OptionsSelectionListener mListener;
 
+
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mListener = (OptionsSelectionListener) activity;
+
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OptionSelectionListener");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,17 +64,5 @@ public class WritableOptionsFragment extends Fragment {
                 mListener.onSelectImg();
             }
         });
-    }
-
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mListener = (OptionsSelectionListener) activity;
-
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OptionSelectionListener");
-        }
     }
 }

@@ -5,11 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.university.gualdras.tfgapp.ContactItem;
+import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
 
 import java.util.ArrayList;

@@ -1,6 +1,10 @@
 package com.university.gualdras.tfgapp.presentation.chat;
 
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Loader;
+import android.database.Cursor;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by gualdras on 23/09/15.
  */
-public class MessageListAdapter extends BaseAdapter {
+public class MessageListAdapter extends BaseAdapter implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ArrayList<TextView> mList = new ArrayList<TextView>();
     private static LayoutInflater inflater = null;
@@ -49,5 +53,23 @@ public class MessageListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         return null;
+    }
+
+
+
+    //----------------------------------------------
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

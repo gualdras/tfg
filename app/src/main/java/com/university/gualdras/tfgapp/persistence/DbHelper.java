@@ -5,8 +5,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.university.gualdras.tfgapp.FriendProfile;
-import com.university.gualdras.tfgapp.Message;
+import com.university.gualdras.tfgapp.domain.FriendProfile;
+import com.university.gualdras.tfgapp.domain.Message;
 
 /**
  * Created by gualdras on 11/10/15.

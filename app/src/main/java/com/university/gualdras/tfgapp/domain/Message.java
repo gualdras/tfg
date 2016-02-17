@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.domain;
 
 /**
  * Created by gualdras on 11/10/15.

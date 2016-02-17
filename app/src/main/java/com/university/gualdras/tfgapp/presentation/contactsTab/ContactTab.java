@@ -15,11 +15,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.university.gualdras.tfgapp.Constants;
-import com.university.gualdras.tfgapp.ContactItem;
+import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
-public class ContactTab extends ListFragment implements Constants {
+public class ContactTab extends ListFragment {
 
     private Context mContext;
     private ContactListAdapter contactListAdapter;

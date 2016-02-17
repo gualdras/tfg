@@ -10,10 +10,17 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.gcm.QuickstartPreferences;
+import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.ServerSharedConstants;
+import com.university.gualdras.tfgapp.StartActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 /**
  * Created by gualdras on 5/10/15.
@@ -24,6 +31,9 @@ public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
+    private static final int MAX_ATTEMPTS = 5;
+    private static final String REGISTRATION_URL = Constants.SERVER_URL + "/users";
+    private static HttpURLConnection httpURLConnection;
 
     public RegistrationIntentService() {
         super(TAG);
@@ -39,7 +49,7 @@ public class RegistrationIntentService extends IntentService {
             // are local.
             // [START get_token]
             InstanceID instanceID = InstanceID.getInstance(this);
-            String token = instanceID.getToken(QuickstartPreferences.SENDER_ID,
+            String token = instanceID.getToken(Preferences.SENDER_ID,
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
             Log.i(TAG, "GCM Registration Token: " + token);
@@ -48,21 +58,24 @@ public class RegistrationIntentService extends IntentService {
             sendRegistrationToServer(token);
 
             // Subscribe to topic channels
-            subscribeTopics(token);
+            //subscribeTopics(token);
 
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, true).apply();
+            sharedPreferences.edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
-            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false).apply();
+            sharedPreferences.edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, false).apply();
+        } finally {
+            if (null != httpURLConnection)
+                httpURLConnection.disconnect();
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
-        Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
+        Intent registrationComplete = new Intent(Preferences.REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
@@ -74,8 +87,22 @@ public class RegistrationIntentService extends IntentService {
      *
      * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
+    private void sendRegistrationToServer(String token) throws IOException, JSONException {
+
+        JSONObject jsonParam = new JSONObject();
+
+
+        jsonParam.put(ServerSharedConstants.PHONE_NUMBER, StartActivity.getPhoneNumber());
+        jsonParam.put(ServerSharedConstants.SENDER_ID, Constants.SENDER_ID);
+
+        httpURLConnection = (HttpURLConnection) new URL(REGISTRATION_URL)
+                .openConnection();
+
+        ServerComunication.post(httpURLConnection, jsonParam);
+
+        if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+            throw new IOException("Post failed with error code " + httpURLConnection.getResponseCode());
+        }
 
     }
 
@@ -93,5 +120,4 @@ public class RegistrationIntentService extends IntentService {
         }
     }
     // [END subscribe_topics]
-
 }

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.StartActivity;
 
 /**
  * Created by gualdras on 12/10/15.
@@ -38,7 +39,13 @@ public class WriteMessageFragment extends Fragment{
 
         mEditText = (EditText) getActivity().findViewById(R.id.et_write_message);
         sendBtn = (Button) getActivity().findViewById(R.id.btn_send);
-
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Todo - change destinatary
+                ChatActivity.sendMessage(mEditText.getText().toString(), StartActivity.getPhoneNumber());
+            }
+        });
         mEditText.requestFocus();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);

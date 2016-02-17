@@ -2,10 +2,14 @@ package com.university.gualdras.tfgapp.presentation;
 
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -14,12 +18,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.university.gualdras.tfgapp.ContactItem;
+import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.gcm.QuickstartPreferences;
+import com.university.gualdras.tfgapp.gcm.Preferences;
+import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 import com.university.gualdras.tfgapp.presentation.contactsTab.ContactListAdapter;
 
 
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
+    SharedPreferences sharedPreferences;
 
     // TODO - Check for google play services apk
     @Override
@@ -74,29 +81,33 @@ public class MainActivity extends AppCompatActivity {
         });
         viewPager.setCurrentItem(1);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         /*
         //gcm stuff
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(context);
+                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                 boolean sentToken = sharedPreferences
-                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                        .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    Toast.makeText(context, getString(R.string.gcm_send_message), Toast.LENGTH_LONG);
+                    Toast.makeText(context, "Registered", Toast.LENGTH_LONG);
                 } else {
-                    Toast.makeText(context, getString(R.string.token_error_message), Toast.LENGTH_LONG);
+                    Toast.makeText(context, "Error", Toast.LENGTH_LONG);
                 }
             }
         };
+        */
 
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
+            if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
         }
-        */
+
     }
 
     // TODO - Check for google play services apk
@@ -104,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+                new IntentFilter(Preferences.REGISTRATION_COMPLETE));
     }
 
     //TODO - Delete the manual adding of contacts
