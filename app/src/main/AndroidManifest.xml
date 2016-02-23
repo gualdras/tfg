@@ -24,6 +24,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".presentation.MainActivity"
             android:label="@string/app_name">
@@ -33,9 +34,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".presentation.chat.ChatActivity"
             android:label=""/>
+
+        <provider
+            android:name=".persistence.DataProvider"
+            android:authorities="com.university.gualdras.tfgapp.provider"
+            android:exported="false" >
+        </provider>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -54,6 +62,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
+
         <service
             android:name=".gcm.MyInstanceIDListenerService"
             android:exported="false">
@@ -61,6 +70,7 @@
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
+
         <service
             android:name=".gcm.RegistrationIntentService"
             android:exported="false">

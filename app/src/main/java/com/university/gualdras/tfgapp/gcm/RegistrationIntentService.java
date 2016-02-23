@@ -93,7 +93,7 @@ public class RegistrationIntentService extends IntentService {
 
 
         jsonParam.put(ServerSharedConstants.PHONE_NUMBER, StartActivity.getPhoneNumber());
-        jsonParam.put(ServerSharedConstants.SENDER_ID, Constants.SENDER_ID);
+        jsonParam.put(ServerSharedConstants.TOKEN, token);
 
         httpURLConnection = (HttpURLConnection) new URL(REGISTRATION_URL)
                 .openConnection();

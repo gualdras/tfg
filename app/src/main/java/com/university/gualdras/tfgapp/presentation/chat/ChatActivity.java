@@ -3,6 +3,8 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -10,15 +12,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.university.gualdras.tfgapp.Constants;
@@ -26,6 +24,7 @@ import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.StartActivity;
 import com.university.gualdras.tfgapp.gcm.ServerComunication;
+import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,9 +54,12 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     private WriteMessageFragment mWriteMessage = new WriteMessageFragment();
     private WritableOptionsFragment mWritableOptions = new WritableOptionsFragment();
 
+    private static Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_chat);
 
 
@@ -167,9 +169,10 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFragmentManager.executePendingTransactions();
     }
 
+    //Todo: change all of this for phone number
     @Override
     public String getProfileEmail() {
-        return null;
+        return "123456";
     }
 
 
@@ -177,9 +180,9 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
 
     public static void sendMessage(final String msg, final String to) {
-        new AsyncTask<Void, Void, String>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected String doInBackground(Void... params) {
+            protected Void doInBackground(Void... params) {
                 HttpURLConnection httpURLConnection = null;
                 try {
                     httpURLConnection = (HttpURLConnection) new URL(Constants.USERS_URL + "/" + to + Constants.SEND)
@@ -191,7 +194,6 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                 JSONObject jsonParam = new JSONObject();
                 try {
                     jsonParam.put(ServerSharedConstants.FROM, StartActivity.getPhoneNumber());
-                    //jsonParam.put(ServerSharedConstants.TO, to);
                     jsonParam.put(ServerSharedConstants.MSG, msg);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -199,7 +201,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
                 try {
                     ServerComunication.post(httpURLConnection, jsonParam);
-                    if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED) {
+                    if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED) {
                         httpURLConnection.getResponseCode();
                     }
                 } catch (IOException e) {
@@ -209,9 +211,17 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                         httpURLConnection.disconnect();
                 }
 
-                return "";
+                saveMessage(msg, to);
+                return null;
             }
         }.execute(null, null, null);
+    }
+
+    private static void saveMessage(String msg, String to){
+        ContentValues values = new ContentValues(2);
+        values.put(DataProvider.COL_MSG, msg);
+        values.put(DataProvider.COL_TO, to);
+        mContext.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
     }
 }
 

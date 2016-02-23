@@ -2,6 +2,7 @@ package com.university.gualdras.tfgapp.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
+import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
 /**
  * Created by gualdras on 5/10/15.
@@ -27,16 +29,17 @@ public class MyGcmListenerService extends GcmListenerService {
     /**
      * Called when message is received.
      *
-     * @param from SenderID of the sender.
+     * @param senderID SenderID of the sender.
      * @param data Data bundle containing message data as key/value pairs.
      *             For Set of keys use data.keySet().
      */
     // [START receive_message]
     @Override
-    public void onMessageReceived(String from, Bundle data) {
+    public void onMessageReceived(String senderID, Bundle data) {
         //TODO wakelock
         String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
+        String from = data.getString("phoneNumberFrom");
+        Log.d(TAG, "SenderID: " + senderID);
         Log.d(TAG, "Message: " + message);
 
         /*if (from.startsWith("/topics/")) {

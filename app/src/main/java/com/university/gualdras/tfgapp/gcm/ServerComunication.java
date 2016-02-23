@@ -24,4 +24,6 @@ public class ServerComunication {
         wr.close();
     }
 
+    //Todo: Implement incremental backoff post
+
 }

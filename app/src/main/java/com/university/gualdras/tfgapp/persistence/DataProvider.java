@@ -17,36 +17,36 @@ import android.net.Uri;
  */
 public class DataProvider extends ContentProvider {
 	
-	public static final Uri CONTENT_URI_MESSAGES = Uri.parse("content://com.university.gualdras.tfg/messages");
-	public static final Uri CONTENT_URI_PROFILE = Uri.parse("content://com.university.gualdras.tfg/profile");
+	public static final Uri CONTENT_URI_MESSAGES = Uri.parse("content://com.university.gualdras.tfgapp.provider/messages");
+	public static final Uri CONTENT_URI_PROFILE = Uri.parse("content://com.university.gualdras.tfgapp.provider/profile");
 
 	public static final String COL_ID = "_id";
-	
+
 	public static final String TABLE_MESSAGES = "messages";
 	public static final String COL_MSG = "msg";
-	public static final String COL_FROM = "email";
-	public static final String COL_TO = "email2";
+	public static final String COL_FROM = "phoneNumberFrom";
+	public static final String COL_TO = "phoneNumberTo";
 	public static final String COL_AT = "at";
-	
+
 	public static final String TABLE_PROFILE = "profile";
 	public static final String COL_NAME = "name";
-	public static final String COL_EMAIL = "email";
+	public static final String COL_PHONE_NUMBER = "phoneNumber";
 	public static final String COL_COUNT = "count";
-	
+
 	private DbHelper dbHelper;
-	
+
 	private static final int MESSAGES_ALLROWS = 1;
 	private static final int MESSAGES_SINGLE_ROW = 2;
 	private static final int PROFILE_ALLROWS = 3;
 	private static final int PROFILE_SINGLE_ROW = 4;
-	
+
 	private static final UriMatcher uriMatcher;
 	static {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-		uriMatcher.addURI("com.university.gualdras.tfg", "messages", MESSAGES_ALLROWS);
-		uriMatcher.addURI("com.university.gualdras.tfg", "messages/#", MESSAGES_SINGLE_ROW);
-		uriMatcher.addURI("com.university.gualdras.tfg", "profile", PROFILE_ALLROWS);
-		uriMatcher.addURI("com.university.gualdras.tfg", "profile/#", PROFILE_SINGLE_ROW);
+		uriMatcher.addURI("com.university.gualdras.tfgapp.provider", "messages", MESSAGES_ALLROWS);
+		uriMatcher.addURI("com.university.gualdras.tfgapp.provider", "messages/#", MESSAGES_SINGLE_ROW);
+		uriMatcher.addURI("com.university.gualdras.tfgapp.provider", "profile", PROFILE_ALLROWS);
+		uriMatcher.addURI("com.university.gualdras.tfgapp.provider", "profile/#", PROFILE_SINGLE_ROW);
 	}
 
 	@Override
@@ -193,7 +193,7 @@ public class DataProvider extends ContentProvider {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("create table messages (_id integer primary key autoincrement, msg text, phoneNumber text, phoneNumber2 text, at datetime default current_timestamp);");
+			db.execSQL("create table messages (_id integer primary key autoincrement, msg text, phoneNumberFrom text, phoneNumberTo text, at datetime default current_timestamp);");
 			db.execSQL("create table profile (_id integer primary key autoincrement, name text, phoneNumber text unique, count integer default 0);");
 		}
 

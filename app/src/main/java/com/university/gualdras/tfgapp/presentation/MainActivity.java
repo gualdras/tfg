@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        /*
+
         //gcm stuff
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -98,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        */
+
 
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
-            if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
+            //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
                 Intent intent = new Intent(this, RegistrationIntentService.class);
                 startService(intent);
-            }
+            //}
         }
 
     }

@@ -28,7 +28,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 	private static final DateFormat[] df = new DateFormat[] {
 		DateFormat.getDateInstance(), DateFormat.getTimeInstance()};
 
-	private OnFragmentInteractionListener mListener;
+	private OnFragmentInteractionListener  mListener;
 	private SimpleCursorAdapter adapter;
 	private Date now;
 	
@@ -60,7 +60,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 				switch(view.getId()) {
 				case R.id.msg:
-					LinearLayout root = (LinearLayout) view.getParent().getParent();
+					LinearLayout root = (LinearLayout) view.getParent();
 					if (cursor.getString(cursor.getColumnIndex(DataProvider.COL_FROM)) == null) {
 						root.setGravity(Gravity.RIGHT);
 						root.setPadding(50, 10, 10, 10);
@@ -70,7 +70,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 					}
 					break;
 
-				case R.id.text2:
+				case R.id.time:
 					TextView tv = (TextView) view;
 					tv.setText(getDisplayTime(cursor.getString(columnIndex)));
 					return true;
@@ -89,7 +89,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 		getListView().setDivider(null);
 		
 		Bundle args = new Bundle();
-		args.putString(DataProvider.COL_EMAIL, mListener.getProfileEmail());
+		args.putString(DataProvider.COL_PHONE_NUMBER, mListener.getProfileEmail());
 		getLoaderManager().initLoader(0, args, this);
 	}
 
@@ -119,7 +119,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		String profileEmail = args.getString(DataProvider.COL_EMAIL);
+		String profileEmail = args.getString(DataProvider.COL_PHONE_NUMBER);
 		CursorLoader loader = new CursorLoader(getActivity(), 
 				DataProvider.CONTENT_URI_MESSAGES, 
 				null, 
