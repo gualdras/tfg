@@ -11,16 +11,20 @@ import android.telephony.TelephonyManager;
 public class StartActivity extends Application {
 
     private static SharedPreferences prefs;
-    static String phoneNumber="";
+    static String mPhoneNumber="";
     @Override
     public void onCreate() {
         super.onCreate();
 
         TelephonyManager tMgr = (TelephonyManager)getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        phoneNumber = tMgr.getLine1Number();
+        mPhoneNumber = tMgr.getLine1Number();
     }
 
     public static String getPhoneNumber(){
         return "123456";
+    }
+
+    public static void setPhoneNumber(String phoneNumber){
+        mPhoneNumber = phoneNumber;
     }
 }

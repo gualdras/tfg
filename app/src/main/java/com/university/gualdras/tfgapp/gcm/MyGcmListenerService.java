@@ -15,7 +15,6 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
-import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
 /**
  * Created by gualdras on 5/10/15.
@@ -37,10 +36,10 @@ public class MyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String senderID, Bundle data) {
         //TODO wakelock
-        String message = data.getString("message");
+        String msg = data.getString("message");
         String from = data.getString("phoneNumberFrom");
         Log.d(TAG, "SenderID: " + senderID);
-        Log.d(TAG, "Message: " + message);
+        Log.d(TAG, "Message: " + msg);
 
         /*if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -56,26 +55,30 @@ public class MyGcmListenerService extends GcmListenerService {
          *     - Update UI.
          */
 
-        ContentValues values = new ContentValues(2);
-        values.put(DataProvider.COL_MSG, message);
-        values.put(DataProvider.COL_FROM, from);
-        this.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
+        saveMessage(msg, from);
 
         /**
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+        sendNotification(msg);
         // [END_EXCLUDE]
     }
     // [END receive_message]
 
+    private void saveMessage(String msg, String from){
+        ContentValues values = new ContentValues(2);
+        values.put(DataProvider.COL_MSG, msg);
+        values.put(DataProvider.COL_FROM, from);
+        this.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
+    }
+
     /**
      * Create and show a simple notification containing the received GCM message.
      *
-     * @param message GCM message received.
+     * @param msg GCM message received.
      */
-    private void sendNotification(String message) {
+    private void sendNotification(String msg) {
         //TODO
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -86,7 +89,7 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
                 .setContentTitle("Message")
-                .setContentText(message)
+                .setContentText(msg)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);

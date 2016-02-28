@@ -184,14 +184,9 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
             @Override
             protected Void doInBackground(Void... params) {
                 HttpURLConnection httpURLConnection = null;
-                try {
-                    httpURLConnection = (HttpURLConnection) new URL(Constants.USERS_URL + "/" + to + Constants.SEND)
-                            .openConnection();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
                 JSONObject jsonParam = new JSONObject();
+                String url = Constants.USERS_URL + "/" + to + Constants.SEND;
+
                 try {
                     jsonParam.put(ServerSharedConstants.FROM, StartActivity.getPhoneNumber());
                     jsonParam.put(ServerSharedConstants.MSG, msg);
@@ -200,9 +195,9 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                 }
 
                 try {
-                    ServerComunication.post(httpURLConnection, jsonParam);
+                    httpURLConnection = ServerComunication.post(url, jsonParam);
                     if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED) {
-                        httpURLConnection.getResponseCode();
+                        //Todo: do something
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

@@ -12,16 +12,19 @@ import java.net.URL;
  */
 public class ServerComunication {
 
-    public static void post(HttpURLConnection httpUrlConnection, JSONObject jsonParams) throws IOException {
+    public static HttpURLConnection post(String url, JSONObject jsonParams) throws IOException {
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url)
+                .openConnection();
+        httpURLConnection.setRequestMethod("POST");
 
-        httpUrlConnection.setRequestMethod("POST");
+        httpURLConnection.setRequestProperty("Content-Type", "application/json");
 
-        httpUrlConnection.setRequestProperty("Content-Type", "application/json");
-
-        DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream ());
+        DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream ());
         wr.writeBytes(jsonParams.toString());
         wr.flush();
         wr.close();
+
+        return httpURLConnection;
     }
 
     //Todo: Implement incremental backoff post

@@ -8,4 +8,5 @@ public interface ServerSharedConstants {
     String MSG = "message";
     String PHONE_NUMBER = "phoneNumber";
     String TOKEN = "regID";
+    String CONTACTS = "contacts";
 }

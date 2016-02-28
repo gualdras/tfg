@@ -95,10 +95,7 @@ public class RegistrationIntentService extends IntentService {
         jsonParam.put(ServerSharedConstants.PHONE_NUMBER, StartActivity.getPhoneNumber());
         jsonParam.put(ServerSharedConstants.TOKEN, token);
 
-        httpURLConnection = (HttpURLConnection) new URL(REGISTRATION_URL)
-                .openConnection();
-
-        ServerComunication.post(httpURLConnection, jsonParam);
+        httpURLConnection = ServerComunication.post(REGISTRATION_URL, jsonParam);
 
         if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
             throw new IOException("Post failed with error code " + httpURLConnection.getResponseCode());

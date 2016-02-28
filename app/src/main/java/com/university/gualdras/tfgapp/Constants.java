@@ -7,6 +7,12 @@ public interface Constants {
 
     public static final String EXTRA_CONTACT_NAME = "ExtraContactItem";
     public static final String EXTRA_PHOTO_PROFILE = "ExtraPhotoProfile";
+
+    //preferences
+
+    String FIRST_TIME = "firstTime";
+
+
     public static final String SENDER_ID = "122334701005";
     public static final String SERVER_URL = "http://tfg-server.appspot.com";
     String USERS_URL = SERVER_URL + "/users";
