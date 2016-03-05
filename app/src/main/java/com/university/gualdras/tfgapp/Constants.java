@@ -13,6 +13,10 @@ public interface Constants {
     String FIRST_TIME = "firstTime";
 
 
+    int INSTALL_CODE = 1;
+
+
+
     public static final String SENDER_ID = "122334701005";
     public static final String SERVER_URL = "http://tfg-server.appspot.com";
     String USERS_URL = SERVER_URL + "/users";

@@ -35,9 +35,10 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".presentation.chat.ChatActivity"
-            android:label=""/>
+        <activity android:name=".presentation.chat.ChatActivity"/>
+
+        <activity android:name=".InstallActivity"
+            android:noHistory="true"/>
 
         <provider
             android:name=".persistence.DataProvider"

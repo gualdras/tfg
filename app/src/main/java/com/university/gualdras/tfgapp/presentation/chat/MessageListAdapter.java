@@ -20,6 +20,9 @@ import java.util.ArrayList;
 /**
  * Created by gualdras on 23/09/15.
  */
+
+
+//Todo: Remove this class
 public class MessageListAdapter extends BaseAdapter {
 
     private ArrayList<MessageItem> mList = new ArrayList<MessageItem>();

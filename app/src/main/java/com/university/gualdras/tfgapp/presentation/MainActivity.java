@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.InstallActivity;
 import com.university.gualdras.tfgapp.StartActivity;
 import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
@@ -61,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true)){
+            startActivityForResult(new Intent(this, InstallActivity.class), Constants.INSTALL_CODE);
+        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
@@ -107,21 +114,13 @@ public class MainActivity extends AppCompatActivity {
                 boolean sentToken = sharedPreferences
                         .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    Toast.makeText(context, "Registered", Toast.LENGTH_LONG);
+                    Toast.makeText(context, "Registered", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(context, "Error", Toast.LENGTH_LONG);
+                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
                 }
             }
         };
-
-
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM.
-            //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            //}
-        }
+        
         mContext = this;
 
     }
@@ -138,10 +137,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true)){
-            getPhoneNumber();
-        }
         //Todo: delete
         Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.jserrano);
         ContactItem jesus = new ContactItem(bMap, "Jesus");
@@ -165,46 +160,27 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getPhoneNumber(){
-        DialogFragment mDialog = UserPhoneNumberFragment.newInstance();
-        mDialog.show(getFragmentManager(), getString(R.string.phonenumber_dialog_title));
-    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == Constants.INSTALL_CODE && resultCode == RESULT_OK){
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(Constants.FIRST_TIME, false);
+            editor.apply();
 
-
-    //Todo: review the utility of trim()
-    private String GetCountryZipCode(){
-        String countryID;
-        String CountryZipCode = "";
-        boolean found = false;
-
-        TelephonyManager manager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        //getNetworkCountryIso
-        countryID = manager.getSimCountryIso().toUpperCase().trim();
-        String[] countryCodes = this.getResources().getStringArray(R.array.CountryCodes);
-        for(int i = 0; i < countryCodes.length && !found; i++){
-            String[] c = countryCodes[i].split(",");
-            if(c[1].trim().equals(countryID)){
-                CountryZipCode = c[0].trim();
-                found = true;
+            if (checkPlayServices()) {
+                // Start IntentService to register this application with GCM.
+                //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+                //}
             }
         }
-        return CountryZipCode;
-    }
-
-    private static int getDefaultCountryCodePosition(Spinner countryCodes){
-        ArrayAdapter adapter = (ArrayAdapter) countryCodes.getAdapter();
-        TelephonyManager manager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-        int spinnerPosition = 0;
-        String countryID = manager.getSimCountryIso().toUpperCase().trim();
-        String[] codes = mContext.getResources().getStringArray(R.array.CountryCodes);
-        for(String c: codes){
-            String [] codeParts = c.split(",");
-            if(codeParts[1].trim().equals(countryID)){
-                spinnerPosition = adapter.getPosition(c);
+        else {
+            if(requestCode == Constants.INSTALL_CODE && resultCode == RESULT_CANCELED){
+                finish();
             }
         }
-        return spinnerPosition;
     }
 
     private boolean checkPlayServices() {
@@ -221,73 +197,5 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
-    }
-
-    public static class UserPhoneNumberFragment extends DialogFragment {
-
-        Spinner spinnerCodes;
-        EditText phoneNumberET;
-
-        public static UserPhoneNumberFragment newInstance(){
-            return new UserPhoneNumberFragment();
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.phonenumber_dialog, null);
-            spinnerCodes = (Spinner) view.findViewById(R.id.country_code_spinner);
-            phoneNumberET = (EditText) view.findViewById(R.id.phone_number_et);
-
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                    R.array.CountryCodes, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerCodes.setAdapter(adapter);
-            spinnerCodes.setSelection(getDefaultCountryCodePosition(spinnerCodes));
-
-            //Todo: Try it with normal app and appcompat
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setView(view);
-
-            builder.setCancelable(false);
-
-            builder.setMessage(getString(R.string.phonenumber_dialog_message));
-
-            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String completePhoneNumber;
-                    String countryCode = (String) spinnerCodes.getSelectedItem();
-                    String localNumber = phoneNumberET.getText().toString();
-                    completePhoneNumber = countryCode.split(",")[0] + localNumber;
-                    StartActivity.setPhoneNumber(completePhoneNumber);
-
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(Constants.FIRST_TIME, false);
-                    editor.commit();
-                }
-            });
-            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    getActivity().finish();
-                    System.exit(0);
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(phoneNumberET, InputMethodManager.SHOW_IMPLICIT);
-                }
-            });
-            return dialog;
-        }
     }
 }

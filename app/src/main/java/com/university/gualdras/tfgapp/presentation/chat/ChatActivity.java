@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.InstallActivity;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.StartActivity;
@@ -73,6 +74,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         Intent myIntent = getIntent();
         contactName.setText(myIntent.getStringExtra(Constants.EXTRA_CONTACT_NAME));
@@ -172,7 +174,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     //Todo: change all of this for phone number
     @Override
     public String getProfileEmail() {
-        return "123456";
+        return StartActivity.getPhoneNumber();
     }
 
 

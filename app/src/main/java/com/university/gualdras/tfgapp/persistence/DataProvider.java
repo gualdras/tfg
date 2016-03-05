@@ -31,7 +31,7 @@ public class DataProvider extends ContentProvider {
 	public static final String TABLE_PROFILE = "profile";
 	public static final String COL_NAME = "name";
 	public static final String COL_PHONE_NUMBER = "phoneNumber";
-	public static final String COL_COUNT = "count";
+	public static final String COL_PHOTO = "photo";
 
 	private DbHelper dbHelper;
 
@@ -96,10 +96,6 @@ public class DataProvider extends ContentProvider {
 		switch(uriMatcher.match(uri)) {
 		case MESSAGES_ALLROWS:
 			id = db.insertOrThrow(TABLE_MESSAGES, null, values);
-			if (values.get(COL_TO) == null) {
-				db.execSQL("update profile set count = count+1 where phoneNumber = ?", new Object[]{values.get(COL_FROM)});
-				getContext().getContentResolver().notifyChange(CONTENT_URI_PROFILE, null);
-			}
 			break;
 			
 		case PROFILE_ALLROWS:
@@ -194,7 +190,7 @@ public class DataProvider extends ContentProvider {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL("create table messages (_id integer primary key autoincrement, msg text, phoneNumberFrom text, phoneNumberTo text, at datetime default current_timestamp);");
-			db.execSQL("create table profile (_id integer primary key autoincrement, name text, phoneNumber text unique, count integer default 0);");
+			db.execSQL("create table profile (_id integer primary key autoincrement, name text, phoneNumber text unique, photo text);");
 		}
 
 		@Override

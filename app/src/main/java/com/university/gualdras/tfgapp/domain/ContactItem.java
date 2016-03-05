@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 
 public class ContactItem {
 
-    private Bitmap photoProfile;
+    private String photoProfile;
     private String contactName;
     private String phoneNumber;
 
@@ -16,18 +16,18 @@ public class ContactItem {
     }
 
 
-    public ContactItem(Bitmap photoProfile, String contactName) {
+    public ContactItem(String photoProfile, String contactName) {
         this.photoProfile = photoProfile;
         this.contactName = contactName;
     }
 
-    public ContactItem(Bitmap photoProfile, String contactName, String phoneNumber) {
+    public ContactItem(String photoProfile, String contactName, String phoneNumber) {
         this.photoProfile = photoProfile;
         this.contactName = contactName;
         this.phoneNumber = phoneNumber;
     }
 
-    public Bitmap getPhotoProfile() {
+    public String getPhotoProfile() {
         return photoProfile;
     }
 
@@ -35,7 +35,7 @@ public class ContactItem {
         return contactName;
     }
 
-    public void setPhotoProfile(Bitmap photoProfile) {
+    public void setPhotoProfile(String photoProfile) {
         this.photoProfile = photoProfile;
     }
 

@@ -1,5 +1,6 @@
 package com.university.gualdras.tfgapp;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,14 +52,28 @@ public class InstallActivity extends AppCompatActivity{
                 completePhoneNumber = countryCode.split(",")[0] + localNumber;
                 StartActivity.setPhoneNumber(completePhoneNumber);
 
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(InstallActivity.this);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(Constants.FIRST_TIME, false);
-                editor.apply();
+                setResult(RESULT_OK);
+                finish();
             }
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        et.requestFocus();
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
 
     private int getDefaultCountryCodePosition(Spinner countryCodes){
         ArrayAdapter adapter = (ArrayAdapter) countryCodes.getAdapter();

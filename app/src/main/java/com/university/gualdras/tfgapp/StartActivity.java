@@ -21,7 +21,7 @@ public class StartActivity extends Application {
     }
 
     public static String getPhoneNumber(){
-        return "123456";
+        return mPhoneNumber;
     }
 
     public static void setPhoneNumber(String phoneNumber){

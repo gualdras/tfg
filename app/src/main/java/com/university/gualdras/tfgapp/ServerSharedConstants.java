@@ -9,4 +9,5 @@ public interface ServerSharedConstants {
     String PHONE_NUMBER = "phoneNumber";
     String TOKEN = "regID";
     String CONTACTS = "contacts";
+    String ID = "id";
 }

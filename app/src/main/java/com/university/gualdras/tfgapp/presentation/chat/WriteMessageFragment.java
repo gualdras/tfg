@@ -44,6 +44,7 @@ public class WriteMessageFragment extends Fragment{
             public void onClick(View v) {
                 //Todo - change destinatary
                 ChatActivity.sendMessage(mEditText.getText().toString(), StartActivity.getPhoneNumber());
+                mEditText.getText().clear();
             }
         });
         mEditText.requestFocus();
