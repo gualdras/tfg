@@ -54,15 +54,15 @@ public class ContactListAdapter extends BaseAdapter{
             holder = new ViewHolder();
             newView = inflater
                     .inflate(R.layout.contact_item, parent, false);
-            holder.photoProfile = (CircleImageView) newView.findViewById(R.id.profile_image);
-            holder.contactName = (TextView) newView.findViewById(R.id.contactName);
+            holder.photoProfile = (CircleImageView) newView.findViewById(R.id.contact_profile_photo);
+            holder.contactName = (TextView) newView.findViewById(R.id.contact_name);
             newView.setTag(holder);
 
         } else {
             holder = (ViewHolder) newView.getTag();
         }
 
-        holder.photoProfile.setImageBitmap(curr.getPhotoProfile());
+        //holder.photoProfile.setImageBitmap(curr.getPhotoProfile());
         holder.contactName.setText(curr.getContactName());
         return newView;
     }

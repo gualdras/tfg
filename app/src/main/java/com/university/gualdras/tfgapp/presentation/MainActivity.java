@@ -41,7 +41,6 @@ import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.gcm.Preferences;
 import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
-import com.university.gualdras.tfgapp.presentation.contactsTab.ContactListAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -132,17 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(Preferences.REGISTRATION_COMPLETE));
     }
 
-    //TODO - Delete the manual adding of contacts
-    @Override
-    protected void onStart(){
-        super.onStart();
-
-        //Todo: delete
-        Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.jserrano);
-        ContactItem jesus = new ContactItem(bMap, "Jesus");
-        ContactListAdapter contactListAdapter = new ContactListAdapter(getApplicationContext());
-        contactListAdapter.add(jesus);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

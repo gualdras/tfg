@@ -4,20 +4,20 @@ package com.university.gualdras.tfgapp.presentation.contactsTab;
  * Created by gualdras on 19/09/15.
  */
 
-import android.app.LoaderManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,8 +28,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.provider.ContactsContract;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -56,6 +54,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ContactTab extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     String TAG = "contactTab";
@@ -73,10 +73,32 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
                 R.layout.contact_item,
                 null,
                 new String[]{DataProvider.COL_NAME, DataProvider.COL_PHOTO},
-                new int[]{R.id.contact_name, R.id.photo_chat_profile},
+                new int[]{R.id.contact_name, R.id.contact_profile_photo},
                 0);
 
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                switch(view.getId()) {
+                    case R.id.contact_profile_photo:
+                        Bitmap bitmap = null;
+                        Uri photoUri = Uri.parse(cursor.getString(columnIndex));
+                        try {
+                            bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), photoUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        CircleImageView photo = (CircleImageView) view;
+                        photo.setImageBitmap(bitmap);
+                        return true;
+                }
+                return false;
+            }
+        });
         setListAdapter(adapter);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -87,28 +109,10 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    /*@Override
-    public void onActivityCreated(Bundle savedState) {
-        super.onActivityCreated(savedState);
-
-        contactListAdapter = new ContactListAdapter(mContext);
-        setListAdapter(contactListAdapter);
-
-        Bitmap bMap1 = BitmapFactory.decodeResource(getResources(), R.drawable.victor);
-        ContactItem victor = new ContactItem(bMap1, "Victor");
-        contactListAdapter.add(victor);
-
-        Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.drawable.jserrano);
-        ContactItem jesus = new ContactItem(bMap, "Jesus");
-        contactListAdapter.add(jesus);
-    }*/
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        ContactItem contactItem = (ContactItem) getListAdapter().getItem(position);
         Intent intent = new Intent(getActivity(), ChatActivity.class);
-        intent.putExtra(Constants.EXTRA_CONTACT_NAME, contactItem.getContactName());
-        intent.putExtra(Constants.EXTRA_PHOTO_PROFILE, contactItem.getPhotoProfile());
+        intent.putExtra(Constants.EXTRA_CONTACT_ID, String.valueOf(id));
         startActivity(intent);
     }
 
@@ -133,6 +137,7 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         return result;
     }
 
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = new CursorLoader(getActivity(),
@@ -154,6 +159,7 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         adapter.swapCursor(null);
     }
 
+
     private class RefreshContactsTask extends AsyncTask<Void, Void, String> {
 
         Boolean error = true;
@@ -171,7 +177,7 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
 
             PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
             Phonenumber.PhoneNumber numberProto = null;
-            Cursor phones;
+            Cursor phones = null;
 
             ContentResolver cr = mContext.getContentResolver();
             Cursor contacts = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
@@ -214,6 +220,14 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
                 }
             }
 
+            //Todo: change this
+            if(phones != null && !phones.isClosed()) {
+                phones.close();
+            }
+
+            if(!contacts.isClosed()) {
+                contacts.close();
+            }
             try {
                 jsonParams.put(ServerSharedConstants.CONTACTS, contactsJson);
             } catch (JSONException e) {
@@ -239,44 +253,22 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(String response) {
             if (!error) {
-                JSONProcess(result);
+                updateContacts(response);
             }
         }
 
-        private void updateContacs(ArrayList<ContactItem> newContacts) {
+        private void updateContacts(String response) {
+            ArrayList<ContactItem> newContacts = JSONProcess(response);
 
             for(ContactItem contact: newContacts) {
-                ContentValues values = new ContentValues(2);
+                ContentValues values = new ContentValues(3);
                 values.put(DataProvider.COL_NAME, contact.getContactName());
                 values.put(DataProvider.COL_PHONE_NUMBER, contact.getPhoneNumber());
                 values.put(DataProvider.COL_PHOTO, contact.getPhotoProfile());
-                mContext.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
+                mContext.getContentResolver().insert(DataProvider.CONTENT_URI_PROFILE, values);
             }
-        }
-
-        private String readStream(InputStream in) {
-            BufferedReader reader = null;
-            StringBuffer data = new StringBuffer("");
-            try {
-                reader = new BufferedReader(new InputStreamReader(in));
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    data.append(line);
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "IOException");
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return data.toString();
         }
 
         //Todo: remove id
@@ -295,31 +287,19 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
                 for (int i = 0; i < contacts.length(); i++) {
 
                     JSONObject c = contacts.getJSONObject(i);
-                    String id = c.getString(ServerSharedConstants.ID);
-
 
                     phoneNumber = c.getString(ServerSharedConstants.PHONE_NUMBER);
 
-                    /*String whereName = ContactsContract.Data.MIMETYPE + " = ? AND " + ContactsContract.CommonDataKinds.StructuredName.CONTACT_ID + " = ?";
-                    String[] whereNameParams = new String[]{ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE, id};
-                    Cursor nameCur = cr.query(ContactsContract.Data.CONTENT_URI, null, whereName, whereNameParams, ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
-                    while (nameCur.moveToNext()) {
-                        String given = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
-                        String family = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
-                        String display = nameCur.getString(nameCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME));
-                        String kk = given + family;
-                    }
-                    nameCur.close();*/
-
                     Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
                     Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI}, null, null, null);
-
 
                     if(cursor.moveToFirst()) {
                         contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                         photo = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
                     }
-
+                    if(cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
                     result.add(new ContactItem(photo, contactName, phoneNumber));
                 }
             } catch (JSONException e) {
@@ -327,5 +307,28 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
             }
             return result;
         }
+    }
+
+    private String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuffer data = new StringBuffer("");
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                data.append(line);
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "IOException");
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return data.toString();
     }
 }

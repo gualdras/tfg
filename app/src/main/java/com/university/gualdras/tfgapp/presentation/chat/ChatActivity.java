@@ -6,9 +6,11 @@ import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -20,7 +22,6 @@ import android.widget.TextView;
 
 
 import com.university.gualdras.tfgapp.Constants;
-import com.university.gualdras.tfgapp.InstallActivity;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.StartActivity;
@@ -32,7 +33,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,9 +41,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener {
 
-    private ListView messageList;
-    private TextView contactName;
-    private CircleImageView profilePhoto;
+    private TextView contactNameTV;
+    private CircleImageView profilePhotoIV;
 
     //private MessageListAdapter msgListAdapter;
 
@@ -55,6 +54,12 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     private WriteMessageFragment mWriteMessage = new WriteMessageFragment();
     private WritableOptionsFragment mWritableOptions = new WritableOptionsFragment();
 
+    private String contactId;
+    private String profileName;
+    private String contactPhoneNumber;
+    private String contactPhotoId;
+
+
     private static Context mContext;
 
     @Override
@@ -64,21 +69,30 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         setContentView(R.layout.activity_chat);
 
 
-        /*msgListAdapter = new MessageListAdapter(getApplicationContext());
-        messageList = (ListView) findViewById(R.id.list_message);
-        messageList.setAdapter(msgListAdapter);*/
+        Intent myIntent = getIntent();
+        contactId = myIntent.getStringExtra(Constants.EXTRA_CONTACT_ID);
 
+        Cursor c = getContentResolver().query(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, contactId), null, null, null, null);
+        if (c.moveToFirst()) {
+            profileName = c.getString(c.getColumnIndex(DataProvider.COL_NAME));
+            contactPhoneNumber = c.getString(c.getColumnIndex(DataProvider.COL_PHONE_NUMBER));
+            contactPhotoId = c.getString(c.getColumnIndex(DataProvider.COL_PHOTO));
+        }
 
-        profilePhoto = (CircleImageView) findViewById(R.id.photo_chat_profile);
-        contactName = (TextView) findViewById(R.id.contact_name);
+        contactNameTV = (TextView) findViewById(R.id.chat_contact_name);
+        contactNameTV.setText(profileName);
+
+        profilePhotoIV = (CircleImageView) findViewById(R.id.chat_profile_photo);
+        try {
+            profilePhotoIV.setImageBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(contactPhotoId)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_chat);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        Intent myIntent = getIntent();
-        contactName.setText(myIntent.getStringExtra(Constants.EXTRA_CONTACT_NAME));
-        profilePhoto.setImageBitmap((Bitmap) myIntent.getParcelableExtra(Constants.EXTRA_PHOTO_PROFILE));
         mFrameLayout = (FrameLayout) findViewById(R.id.fragment_container);
 
         if(savedInstanceState == null) {
@@ -171,10 +185,9 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFragmentManager.executePendingTransactions();
     }
 
-    //Todo: change all of this for phone number
     @Override
-    public String getProfileEmail() {
-        return StartActivity.getPhoneNumber();
+    public String getContactNumber() {
+        return contactPhoneNumber;
     }
 
 

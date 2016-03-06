@@ -89,7 +89,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 		getListView().setDivider(null);
 		
 		Bundle args = new Bundle();
-		args.putString(DataProvider.COL_PHONE_NUMBER, mListener.getProfileEmail());
+		args.putString(DataProvider.COL_PHONE_NUMBER, mListener.getContactNumber());
 		getLoaderManager().initLoader(0, args, this);
 	}
 
@@ -100,7 +100,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 	}
 
 	public interface OnFragmentInteractionListener {
-		public String getProfileEmail();
+		public String getContactNumber();
 	}
 	
 	private String getDisplayTime(String datetime) {

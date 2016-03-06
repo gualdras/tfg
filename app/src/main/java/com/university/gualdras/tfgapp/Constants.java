@@ -5,7 +5,7 @@ package com.university.gualdras.tfgapp;
  */
 public interface Constants {
 
-    public static final String EXTRA_CONTACT_NAME = "ExtraContactItem";
+    public static final String EXTRA_CONTACT_ID = "ExtraContactId";
     public static final String EXTRA_PHOTO_PROFILE = "ExtraPhotoProfile";
 
     //preferences
