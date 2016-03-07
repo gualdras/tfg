@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp;
+package com.university.gualdras.tfgapp.presentation;
 
 import android.app.Service;
 import android.content.Context;
@@ -14,6 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.StartActivity;
 
 /**
  * Created by gualdras on 28/02/16.

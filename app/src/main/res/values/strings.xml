@@ -11,7 +11,7 @@
     <string name="cancel">Cancel</string>
     <string name="phonenumber_dialog_title">Phone number</string>
     <string name="enter_phone_number">Please, introduce your phone number</string>
-
+    <string name="speech_recognition_hint">Speak now</string>
 
 
     <string-array name="CountryCodes" >

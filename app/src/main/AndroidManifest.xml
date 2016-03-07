@@ -37,7 +37,7 @@
 
         <activity android:name=".presentation.chat.ChatActivity"/>
 
-        <activity android:name=".InstallActivity"
+        <activity android:name=".presentation.InstallActivity"
             android:noHistory="true"/>
 
         <provider

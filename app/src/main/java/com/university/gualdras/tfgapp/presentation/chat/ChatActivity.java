@@ -11,13 +11,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 
@@ -25,6 +25,8 @@ import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.StartActivity;
+import com.university.gualdras.tfgapp.domain.RefreshContactsTask;
+import com.university.gualdras.tfgapp.domain.SendMessageTask;
 import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
@@ -33,6 +35,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,10 +45,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener {
 
+    private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
     private CircleImageView profilePhotoIV;
-
-    //private MessageListAdapter msgListAdapter;
 
     private Toolbar toolbar;
 
@@ -109,7 +112,6 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
             // Commit the FragmentTransaction
             fragmentTransaction.commit();
-
         }
     }
 
@@ -165,7 +167,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFragmentManager.executePendingTransactions();
     }
 
-    public void onSelectImg() {
+    public void onImgSelection() {
         mFragmentManager = getFragmentManager();
 
         // Start a new FragmentTransaction
@@ -186,52 +188,38 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     }
 
     @Override
+    public void onSpeechRecognitionSelection() {
+        Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, R.string.speech_recognition_hint);
+        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().getDisplayLanguage());
+        startActivityForResult(speechIntent, SPEECH_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == SPEECH_CODE){
+            if(resultCode == RESULT_OK){
+                String msg = "";
+                ArrayList<String> words = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                for(String w: words){
+                    msg += w;
+                }
+                sendMessage(msg, contactPhoneNumber);
+            } else{
+                sendMessage("Not understood", contactPhoneNumber);
+            }
+        }
+    }
+
+    @Override
     public String getContactNumber() {
         return contactPhoneNumber;
     }
 
 
-    //TODO: Put addressee. Fix exceptions.
-
-
     public static void sendMessage(final String msg, final String to) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                HttpURLConnection httpURLConnection = null;
-                JSONObject jsonParam = new JSONObject();
-                String url = Constants.USERS_URL + "/" + to + Constants.SEND;
-
-                try {
-                    jsonParam.put(ServerSharedConstants.FROM, StartActivity.getPhoneNumber());
-                    jsonParam.put(ServerSharedConstants.MSG, msg);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    httpURLConnection = ServerComunication.post(url, jsonParam);
-                    if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED) {
-                        //Todo: do something
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (null != httpURLConnection)
-                        httpURLConnection.disconnect();
-                }
-
-                saveMessage(msg, to);
-                return null;
-            }
-        }.execute(null, null, null);
-    }
-
-    private static void saveMessage(String msg, String to){
-        ContentValues values = new ContentValues(2);
-        values.put(DataProvider.COL_MSG, msg);
-        values.put(DataProvider.COL_TO, to);
-        mContext.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
+        new SendMessageTask(mContext, to, msg).execute();
     }
 }
 

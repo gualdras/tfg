@@ -150,7 +150,8 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
 
     //Todo: remove id
     private ArrayList<ContactItem> JSONProcess(String response) {
-        String contactName = "", phoneNumber = "", photo = "";
+        String contactName = "", phoneNumber, photo = "";
+
         ArrayList<ContactItem> result = new ArrayList<>();
 
         ContentResolver cr = mContext.getContentResolver();
@@ -172,7 +173,11 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
 
                 if (cursor.moveToFirst()) {
                     contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                    photo = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                    if((cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI))) != null){
+                        photo = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                    } else {
+                        photo = Constants.DEFAULT_CONTACT_PHOTO;
+                    }
                 }
                 if (cursor != null && !cursor.isClosed()) {
                     cursor.close();

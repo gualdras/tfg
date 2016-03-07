@@ -124,7 +124,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 				DataProvider.CONTENT_URI_MESSAGES, 
 				null, 
 				DataProvider.COL_FROM + " = ? or " + DataProvider.COL_TO + " = ?",
-				new String[]{profileEmail, profileEmail}, 
+				new String[]{profileEmail, profileEmail},
 				DataProvider.COL_AT + " DESC"); 
 		return loader;
 	}

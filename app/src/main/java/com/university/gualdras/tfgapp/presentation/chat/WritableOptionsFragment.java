@@ -2,7 +2,6 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.presentation.chat.OptionsSelectionListener;
 
 /**
  * Created by gualdras on 12/10/15.
@@ -18,7 +16,7 @@ import com.university.gualdras.tfgapp.presentation.chat.OptionsSelectionListener
 
 public class WritableOptionsFragment extends Fragment {
 
-    private ImageButton writeMsgBtn, selectImageBtn;
+    private ImageButton writeMsgBtn, selectImageBtn, speechRecognitionBtn;
 
     private OptionsSelectionListener mListener;
 
@@ -61,7 +59,14 @@ public class WritableOptionsFragment extends Fragment {
         selectImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSelectImg();
+                mListener.onImgSelection();
+            }
+        });
+        speechRecognitionBtn = (ImageButton) getActivity().findViewById(R.id.speech_recognition_btn);
+        speechRecognitionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onSpeechRecognitionSelection();
             }
         });
     }

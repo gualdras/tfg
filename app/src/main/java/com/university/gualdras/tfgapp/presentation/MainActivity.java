@@ -1,44 +1,28 @@
 package com.university.gualdras.tfgapp.presentation;
 
 
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.university.gualdras.tfgapp.Constants;
-import com.university.gualdras.tfgapp.InstallActivity;
-import com.university.gualdras.tfgapp.StartActivity;
-import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.StartActivity;
 import com.university.gualdras.tfgapp.gcm.Preferences;
 import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 
@@ -57,14 +41,13 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     private static Context mContext;
 
-    // TODO - Check for google play services apk
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true)){
+        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true) && StartActivity.getPhoneNumber() == null){
             startActivityForResult(new Intent(this, InstallActivity.class), Constants.INSTALL_CODE);
         }
 
@@ -186,4 +169,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    //Todo: Check also if there is microphone
+
 }

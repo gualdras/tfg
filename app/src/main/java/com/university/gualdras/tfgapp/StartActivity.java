@@ -10,8 +10,7 @@ import android.telephony.TelephonyManager;
  */
 public class StartActivity extends Application {
 
-    private static SharedPreferences prefs;
-    static String mPhoneNumber="";
+    static String mPhoneNumber= null;
     @Override
     public void onCreate() {
         super.onCreate();

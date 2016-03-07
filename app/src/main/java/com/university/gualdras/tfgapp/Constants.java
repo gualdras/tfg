@@ -15,7 +15,7 @@ public interface Constants {
 
     int INSTALL_CODE = 1;
 
-
+    String DEFAULT_CONTACT_PHOTO = "android.resource://com.university.gualdras.tfgapp/" + R.drawable.contact_photo;
 
     public static final String SENDER_ID = "122334701005";
     public static final String SERVER_URL = "http://tfg-server.appspot.com";

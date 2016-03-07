@@ -6,5 +6,6 @@ package com.university.gualdras.tfgapp.presentation.chat;
 public interface OptionsSelectionListener {
 
     void onWriteMsgSelection();
-    void onSelectImg();
+    void onImgSelection();
+    void onSpeechRecognitionSelection();
 }
