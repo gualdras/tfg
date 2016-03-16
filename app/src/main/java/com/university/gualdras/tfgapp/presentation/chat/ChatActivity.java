@@ -3,12 +3,10 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
@@ -20,25 +18,23 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.ServerSharedConstants;
-import com.university.gualdras.tfgapp.StartActivity;
-import com.university.gualdras.tfgapp.domain.RefreshContactsTask;
+import com.university.gualdras.tfgapp.domain.HttpGetTask;
 import com.university.gualdras.tfgapp.domain.SendMessageTask;
-import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+
 
 /**
  * Created by gualdras on 22/09/15.
@@ -166,7 +162,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         fragmentTransaction.commit();
         mFragmentManager.executePendingTransactions();
     }
-
+/*
     public void onImgSelection() {
         mFragmentManager = getFragmentManager();
 
@@ -185,6 +181,17 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
         mFragmentManager.executePendingTransactions();
+    }
+*/
+    public void onImgSelection(){
+        new HttpGetTask().execute();
+
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("title", "My photo")
+                .addFormDataPart("image", "victor.png", RequestBody.create(MediaType.parse("image/png"), new File("drawable/victor.png")))
+                .build();
     }
 
     @Override

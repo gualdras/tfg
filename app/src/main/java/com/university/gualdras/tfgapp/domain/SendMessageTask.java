@@ -44,7 +44,7 @@ public class SendMessageTask extends AsyncTask<Void, Void, Void> {
         }
 
         try {
-            httpURLConnection = ServerComunication.post(url, jsonParam);
+            httpURLConnection = ServerComunication.post(url, jsonParam, Constants.MAX_ATTEMPTS);
             if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_ACCEPTED) {
                 //Todo: do something
             }

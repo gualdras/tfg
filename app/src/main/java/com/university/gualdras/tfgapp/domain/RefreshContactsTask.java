@@ -112,7 +112,7 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
         }
 
         try {
-            httpURLConnection = ServerComunication.post(Constants.USERS_URL, jsonParams);
+            httpURLConnection = ServerComunication.post(Constants.USERS_URL, jsonParams, Constants.MAX_ATTEMPTS);
             int code = httpURLConnection.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
                 InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
