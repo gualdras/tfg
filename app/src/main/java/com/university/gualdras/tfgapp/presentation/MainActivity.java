@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true) && StartActivity.getPhoneNumber() == null){
+        if(sharedPreferences.getBoolean(Constants.FIRST_TIME, true)){
             startActivityForResult(new Intent(this, InstallActivity.class), Constants.INSTALL_CODE);
         }
 
@@ -139,18 +139,22 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean(Constants.FIRST_TIME, false);
             editor.apply();
 
-            if (checkPlayServices()) {
-                // Start IntentService to register this application with GCM.
-                //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-                //}
-            }
+            registrationIntent();
         }
         else {
             if(requestCode == Constants.INSTALL_CODE && resultCode == RESULT_CANCELED){
                 finish();
             }
+        }
+    }
+
+    private void registrationIntent(){
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+            //}
         }
     }
 

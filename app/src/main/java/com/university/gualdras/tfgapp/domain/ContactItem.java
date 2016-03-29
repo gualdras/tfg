@@ -1,7 +1,5 @@
 package com.university.gualdras.tfgapp.domain;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by gualdras on 20/09/15.
  */

@@ -2,7 +2,6 @@ package com.university.gualdras.tfgapp.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;

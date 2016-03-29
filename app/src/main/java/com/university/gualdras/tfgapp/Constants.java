@@ -12,6 +12,7 @@ public interface Constants {
 
     String FIRST_TIME = "firstTime";
 
+    int MAX_ATTEMPTS = 7;
 
     int INSTALL_CODE = 1;
 
@@ -21,4 +22,6 @@ public interface Constants {
     public static final String SERVER_URL = "http://tfg-server.appspot.com";
     String USERS_URL = SERVER_URL + "/users";
     String SEND = "/send";
+    String UPLOAD_FORM_URL = SERVER_URL + "/upload_form";
+    String DOWNLOAD_IMG_URL = SERVER_URL + "/img/";
 }

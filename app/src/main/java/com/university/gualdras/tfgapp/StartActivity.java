@@ -2,13 +2,19 @@ package com.university.gualdras.tfgapp;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.support.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 
 /**
  * Created by gualdras on 9/02/16.
  */
 public class StartActivity extends Application {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     static String mPhoneNumber= null;
     @Override

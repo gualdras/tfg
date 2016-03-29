@@ -11,7 +11,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.StartActivity;
 
 /**
  * Created by gualdras on 12/10/15.

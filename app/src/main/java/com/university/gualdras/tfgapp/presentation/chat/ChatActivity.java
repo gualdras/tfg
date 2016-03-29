@@ -3,12 +3,11 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
@@ -19,26 +18,20 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.ServerSharedConstants;
-import com.university.gualdras.tfgapp.StartActivity;
-import com.university.gualdras.tfgapp.domain.RefreshContactsTask;
+import com.university.gualdras.tfgapp.domain.ImageUpload;
 import com.university.gualdras.tfgapp.domain.SendMessageTask;
-import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
 
 /**
  * Created by gualdras on 22/09/15.
@@ -64,6 +57,8 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
 
     private static Context mContext;
+
+    private int PICK_IMAGE_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +161,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         fragmentTransaction.commit();
         mFragmentManager.executePendingTransactions();
     }
-
+/*
     public void onImgSelection() {
         mFragmentManager = getFragmentManager();
 
@@ -185,6 +180,13 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
         mFragmentManager.executePendingTransactions();
+    }
+*/
+    public void onImgSelection(){
+        Intent chooserIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
     }
 
     @Override
@@ -207,9 +209,27 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                 }
                 sendMessage(msg, contactPhoneNumber);
             } else{
-                sendMessage("Not understood", contactPhoneNumber);
+                Toast.makeText(this, "Not understood", Toast.LENGTH_SHORT).show();
             }
         }
+        else {
+            if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
+                Uri uri = data.getData();
+                String path = getRealPathFromURI(uri);
+                new ImageUpload(mContext, path).execute();
+            }
+        }
+    }
+
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
     @Override

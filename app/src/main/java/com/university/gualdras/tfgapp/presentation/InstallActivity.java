@@ -1,10 +1,7 @@
 package com.university.gualdras.tfgapp.presentation;
 
-import android.app.Service;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;

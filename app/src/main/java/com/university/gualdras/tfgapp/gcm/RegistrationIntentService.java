@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 /**
@@ -95,7 +94,7 @@ public class RegistrationIntentService extends IntentService {
         jsonParam.put(ServerSharedConstants.PHONE_NUMBER, StartActivity.getPhoneNumber());
         jsonParam.put(ServerSharedConstants.TOKEN, token);
 
-        httpURLConnection = ServerComunication.post(REGISTRATION_URL, jsonParam);
+        httpURLConnection = ServerComunication.post(REGISTRATION_URL, jsonParam, Constants.MAX_ATTEMPTS);
 
         if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
             throw new IOException("Post failed with error code " + httpURLConnection.getResponseCode());
