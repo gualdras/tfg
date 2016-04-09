@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,9 +23,11 @@ import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.domain.ImageDownload;
 import com.university.gualdras.tfgapp.domain.ImageUpload;
 import com.university.gualdras.tfgapp.domain.SendMessageTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
+import com.university.gualdras.tfgapp.presentation.InstallActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +62,10 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     private static Context mContext;
 
     private int PICK_IMAGE_CODE = 0;
+
+
+    int kk = 0;
+    public static Bitmap imgKK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,10 +190,15 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     }
 */
     public void onImgSelection(){
-        Intent chooserIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if(kk == 0) {
+            Intent chooserIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-        startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
+            startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
+            kk = 1;
+        } else{
+            profilePhotoIV.setImageBitmap(imgKK);
+        }
     }
 
     @Override
@@ -216,9 +228,13 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
             if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
                 Uri uri = data.getData();
                 String path = getRealPathFromURI(uri);
-                new ImageUpload(mContext, path).execute();
+                new ImageUpload(this, path).execute();
             }
         }
+    }
+
+    public static void startImageDownload(Bitmap bitmap){
+        imgKK = bitmap;
     }
 
     private String getRealPathFromURI(Uri contentUri) {

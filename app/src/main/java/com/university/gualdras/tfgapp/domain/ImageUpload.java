@@ -2,10 +2,15 @@ package com.university.gualdras.tfgapp.domain;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
+import com.university.gualdras.tfgapp.presentation.chat.Kk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -27,21 +32,21 @@ import okhttp3.Response;
 /**
  * Created by gualdras on 9/03/16.
  */
-public class ImageUpload extends AsyncTask<Void, Void, String> {
+public class ImageUpload extends AsyncTask<Void, Void, Bitmap> {
 
     private static final String ITEMS_TAG = "items";
     private static final String TAG = "ImageUpload";
 
     String path;
-    Context context;
+    Activity context;
 
-    public ImageUpload(Context context, String blobkey){
-        this.path = blobkey;
+    public ImageUpload(Activity context, String path){
+        this.path = path;
         this.context = context;
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected Bitmap doInBackground(Void... params) {
         String data = "";
         HttpURLConnection httpUrlConnection = null;
 
@@ -91,12 +96,39 @@ public class ImageUpload extends AsyncTask<Void, Void, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return kk;
+        //Todo: Delete from here
+        Bitmap avatar = null;
+
+        httpUrlConnection = null;
+
+        try {
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.DOWNLOAD_IMG_URL + kk)
+                    .openConnection();
+
+            switch (httpUrlConnection.getResponseCode()){
+                case HttpURLConnection.HTTP_OK:
+                    InputStream in = new BufferedInputStream(
+                            httpUrlConnection.getInputStream());
+
+                    avatar = BitmapFactory.decodeStream(in);
+                    break;
+            }
+
+        } catch (MalformedURLException exception) {
+            Log.e(TAG, "MalformedURLException");
+        } catch (IOException exception) {
+            Log.e(TAG, "IOException");
+        } finally {
+            if (null != httpUrlConnection)
+                httpUrlConnection.disconnect();
+        }
+
+        return avatar;
     }
 
     @Override
-    protected void onPostExecute(String blobKey) {
-        new ImageDownload(context, blobKey).execute();
+    protected void onPostExecute(Bitmap img) {
+        ChatActivity.startImageDownload(img);
     }
 
     private String readStream(InputStream in) {

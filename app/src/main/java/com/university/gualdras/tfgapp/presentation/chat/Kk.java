@@ -1,5 +1,6 @@
 package com.university.gualdras.tfgapp.presentation.chat;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import com.university.gualdras.tfgapp.R;
 /**
  * Created by gualdras on 29/03/16.
  */
-public class Kk extends AppCompatActivity {
+public class Kk extends Activity {
 
     ImageView imageView;
 

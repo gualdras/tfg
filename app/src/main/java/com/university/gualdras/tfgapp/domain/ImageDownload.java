@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 import com.university.gualdras.tfgapp.presentation.chat.Kk;
 
 import java.io.BufferedInputStream;
@@ -24,9 +25,9 @@ import java.net.URL;
 public class ImageDownload extends AsyncTask<Void, Void, Bitmap> {
     private static final String TAG = "ImageDownload";
     String blobkey;
-    Context context;
+    Activity context;
 
-    public ImageDownload(Context context, String blobkey){
+    public ImageDownload(Activity context, String blobkey){
         this.blobkey = blobkey;
         this.context = context;
     }
@@ -63,8 +64,7 @@ public class ImageDownload extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        Intent intent = new Intent(context, Kk.class);
-        intent.putExtra("img", bitmap);
-        context.startActivity(intent);
     }
+
+
 }
