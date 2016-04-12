@@ -3,14 +3,19 @@ package com.university.gualdras.tfgapp.presentation.chat;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 
 /**
  * Created by gualdras on 12/10/15.
@@ -19,6 +24,9 @@ public class WriteMessageFragment extends Fragment{
 
     EditText mEditText;
     Button sendBtn;
+
+    SharedPreferences sharedPreferences;
+
 
     private MessagesFragment.OnFragmentInteractionListener mListener;
 
@@ -33,6 +41,7 @@ public class WriteMessageFragment extends Fragment{
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
@@ -52,8 +61,11 @@ public class WriteMessageFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 //Todo - change destinatary
-                ChatActivity.sendMessage(mEditText.getText().toString(), mListener.getContactNumber());
-                mEditText.getText().clear();
+                if(mEditText.getText().toString().trim().length() != 0) {
+                    MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), mListener.getContactNumber(), MessageItem.TEXT_TYPE, mEditText.getText().toString());
+                    ChatActivity.sendMessage(messageItem);
+                    mEditText.getText().clear();
+                }
             }
         });
         mEditText.requestFocus();

@@ -6,10 +6,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +25,10 @@ import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.ImageDownload;
 import com.university.gualdras.tfgapp.domain.ImageUpload;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.domain.SendMessageTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
-import com.university.gualdras.tfgapp.presentation.InstallActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by gualdras on 22/09/15.
  */
-public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener {
+public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageUploadListener {
 
     private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
@@ -63,9 +64,8 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     private int PICK_IMAGE_CODE = 0;
 
+    SharedPreferences sharedPreferences;
 
-    int kk = 0;
-    public static Bitmap imgKK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +73,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mContext = this;
         setContentView(R.layout.activity_chat);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Intent myIntent = getIntent();
         contactId = myIntent.getStringExtra(Constants.EXTRA_CONTACT_ID);
@@ -152,6 +153,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
 
     public void onWriteMsgSelection() {
+
         // Get a reference to the FragmentManager
         mFragmentManager = getFragmentManager();
 
@@ -190,15 +192,10 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     }
 */
     public void onImgSelection(){
-        if(kk == 0) {
             Intent chooserIntent = new Intent(Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
             startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
-            kk = 1;
-        } else{
-            profilePhotoIV.setImageBitmap(imgKK);
-        }
     }
 
     @Override
@@ -212,6 +209,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        MessageItem messageItem;
         if(requestCode == SPEECH_CODE){
             if(resultCode == RESULT_OK){
                 String msg = "";
@@ -219,7 +217,8 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                 for(String w: words){
                     msg += w;
                 }
-                sendMessage(msg, contactPhoneNumber);
+                messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.TEXT_TYPE, msg);
+                sendMessage(messageItem);
             } else{
                 Toast.makeText(this, "Not understood", Toast.LENGTH_SHORT).show();
             }
@@ -228,14 +227,12 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
             if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
                 Uri uri = data.getData();
                 String path = getRealPathFromURI(uri);
-                new ImageUpload(this, path).execute();
+                messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
+                new ImageUpload(this, path, messageItem).execute();
             }
         }
     }
 
-    public static void startImageDownload(Bitmap bitmap){
-        imgKK = bitmap;
-    }
 
     private String getRealPathFromURI(Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
@@ -254,8 +251,14 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     }
 
 
-    public static void sendMessage(final String msg, final String to) {
-        new SendMessageTask(mContext, to, msg).execute();
+    public static void sendMessage(MessageItem messageItem) {
+        new SendMessageTask(mContext, messageItem).execute();
+    }
+
+    @Override
+    public void onImageUpload(String imgURL) {
+        MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, imgURL);
+        sendMessage(messageItem);
     }
 }
 

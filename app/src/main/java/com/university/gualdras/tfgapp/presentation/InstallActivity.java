@@ -1,7 +1,9 @@
 package com.university.gualdras.tfgapp.presentation;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
@@ -12,8 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.StartActivity;
 
 /**
  * Created by gualdras on 28/02/16.
@@ -23,10 +25,12 @@ public class InstallActivity extends AppCompatActivity{
     Spinner spn;
     EditText et;
     Button okBtn;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         setContentView(R.layout.activity_install);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
@@ -50,7 +54,10 @@ public class InstallActivity extends AppCompatActivity{
                 String countryCode = (String) spn.getSelectedItem();
                 String localNumber = et.getText().toString();
                 completePhoneNumber = countryCode.split(",")[0] + localNumber;
-                StartActivity.setPhoneNumber(completePhoneNumber);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(Constants.PHONE_NUMBER, completePhoneNumber);
+                editor.apply();
 
                 setResult(RESULT_OK);
                 finish();

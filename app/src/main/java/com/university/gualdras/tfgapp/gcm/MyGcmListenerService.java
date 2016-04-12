@@ -12,6 +12,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.university.gualdras.tfgapp.ServerSharedConstants;
+import com.university.gualdras.tfgapp.domain.ImageDownload;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
 
@@ -35,8 +38,9 @@ public class MyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String senderID, Bundle data) {
         //TODO wakelock
-        String msg = data.getString("message");
-        String from = data.getString("phoneNumberFrom");
+        String from = data.getString(ServerSharedConstants.FROM);
+        String type = data.getString(ServerSharedConstants.TYPE);
+        String msg = data.getString(ServerSharedConstants.MSG);
         Log.d(TAG, "SenderID: " + senderID);
         Log.d(TAG, "Message: " + msg);
 
@@ -53,24 +57,23 @@ public class MyGcmListenerService extends GcmListenerService {
          *     - Store message in local database.
          *     - Update UI.
          */
+        MessageItem messageItem = new MessageItem(from, type, msg);
 
-        saveMessage(msg, from);
+        if(type.equals(MessageItem.IMG_TYPE)){
+            new ImageDownload(this, messageItem).execute();
+        }
+        else {
+            messageItem.saveMessageReceived(this);
 
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
-        sendNotification(msg);
-        // [END_EXCLUDE]
+            /**
+             * In some cases it may be useful to show a notification indicating to the user
+             * that a message was received.
+             */
+            sendNotification(msg);
+            // [END_EXCLUDE]
+        }
     }
     // [END receive_message]
-
-    private void saveMessage(String msg, String from){
-        ContentValues values = new ContentValues(2);
-        values.put(DataProvider.COL_MSG, msg);
-        values.put(DataProvider.COL_FROM, from);
-        this.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
-    }
 
     /**
      * Create and show a simple notification containing the received GCM message.

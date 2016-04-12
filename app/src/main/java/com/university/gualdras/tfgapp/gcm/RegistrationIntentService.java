@@ -12,7 +12,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
-import com.university.gualdras.tfgapp.StartActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +33,7 @@ public class RegistrationIntentService extends IntentService {
     private static final String REGISTRATION_URL = Constants.SERVER_URL + "/users";
     private static HttpURLConnection httpURLConnection;
 
+    SharedPreferences sharedPreferences;
     public RegistrationIntentService() {
         super(TAG);
     }
@@ -87,11 +87,11 @@ public class RegistrationIntentService extends IntentService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) throws IOException, JSONException {
-
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         JSONObject jsonParam = new JSONObject();
 
 
-        jsonParam.put(ServerSharedConstants.PHONE_NUMBER, StartActivity.getPhoneNumber());
+        jsonParam.put(ServerSharedConstants.PHONE_NUMBER, sharedPreferences.getString(Constants.PHONE_NUMBER, ""));
         jsonParam.put(ServerSharedConstants.TOKEN, token);
 
         httpURLConnection = ServerComunication.post(REGISTRATION_URL, jsonParam, Constants.MAX_ATTEMPTS);

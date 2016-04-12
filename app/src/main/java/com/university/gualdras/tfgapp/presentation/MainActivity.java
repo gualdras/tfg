@@ -22,7 +22,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.StartActivity;
 import com.university.gualdras.tfgapp.gcm.Preferences;
 import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 

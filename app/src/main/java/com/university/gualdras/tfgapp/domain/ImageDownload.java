@@ -2,15 +2,16 @@ package com.university.gualdras.tfgapp.domain;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.content.CursorLoader;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
-import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
-import com.university.gualdras.tfgapp.presentation.chat.Kk;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,23 +23,24 @@ import java.net.URL;
 /**
  * Created by gualdras on 29/03/16.
  */
-public class ImageDownload extends AsyncTask<Void, Void, Bitmap> {
+public class ImageDownload extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ImageDownload";
-    String blobkey;
-    Activity context;
+    Context mContext;
+    MessageItem messageItem;
 
-    public ImageDownload(Activity context, String blobkey){
-        this.blobkey = blobkey;
-        this.context = context;
+    public ImageDownload(Context context, MessageItem messageItem){
+        this.mContext = context;
+        this.messageItem = messageItem;
     }
 
     @Override
-    protected Bitmap doInBackground(Void... params) {
-        Bitmap avatar = null;
+    protected String doInBackground(Void... params) {
+        Bitmap bitmap = null;
         HttpURLConnection httpUrlConnection = null;
+        String imgPath;
 
         try {
-            httpUrlConnection = (HttpURLConnection) new URL(Constants.DOWNLOAD_IMG_URL + blobkey)
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.DOWNLOAD_IMG_URL + messageItem.getMsg())
                     .openConnection();
 
             switch (httpUrlConnection.getResponseCode()){
@@ -46,7 +48,7 @@ public class ImageDownload extends AsyncTask<Void, Void, Bitmap> {
                     InputStream in = new BufferedInputStream(
                             httpUrlConnection.getInputStream());
 
-                    avatar = BitmapFactory.decodeStream(in);
+                    bitmap = BitmapFactory.decodeStream(in);
                     break;
             }
 
@@ -58,13 +60,26 @@ public class ImageDownload extends AsyncTask<Void, Void, Bitmap> {
             if (null != httpUrlConnection)
                 httpUrlConnection.disconnect();
         }
-
-        return avatar;
+        imgPath = MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "img" , null);
+        return imgPath;
     }
 
     @Override
-    protected void onPostExecute(Bitmap bitmap) {
+    protected void onPostExecute(String imgPath) {
+        Uri uri = Uri.parse(imgPath);
+        String path = getRealPathFromURI(uri);
+        messageItem.setLocalResource(path);
+        messageItem.saveMessageReceived(mContext);
     }
 
-
+    private String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
+    }
 }

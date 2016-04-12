@@ -24,6 +24,7 @@ public class DataProvider extends ContentProvider {
 
 	public static final String TABLE_MESSAGES = "messages";
 	public static final String COL_MSG = "msg";
+	public static final String COL_TYPE = "type";
 	public static final String COL_FROM = "phoneNumberFrom";
 	public static final String COL_TO = "phoneNumberTo";
 	public static final String COL_AT = "at";
@@ -189,7 +190,7 @@ public class DataProvider extends ContentProvider {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("create table messages (_id integer primary key autoincrement, msg text, phoneNumberFrom text, phoneNumberTo text, at datetime default current_timestamp);");
+			db.execSQL("create table messages (_id integer primary key autoincrement, msg text, type text, phoneNumberFrom text, phoneNumberTo text, at datetime default current_timestamp);");
 			db.execSQL("create table profile (_id integer primary key autoincrement, name text, phoneNumber text unique, photo text);");
 		}
 

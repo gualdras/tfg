@@ -6,6 +6,7 @@ package com.university.gualdras.tfgapp;
 public interface ServerSharedConstants {
     String FROM = "phoneNumberFrom";
     String MSG = "message";
+    String TYPE = "type";
     String PHONE_NUMBER = "phoneNumber";
     String TOKEN = "regID";
     String CONTACTS = "contacts";

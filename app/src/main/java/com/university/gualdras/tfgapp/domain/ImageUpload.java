@@ -1,16 +1,13 @@
 package com.university.gualdras.tfgapp.domain;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
-import com.university.gualdras.tfgapp.presentation.chat.Kk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -32,23 +29,29 @@ import okhttp3.Response;
 /**
  * Created by gualdras on 9/03/16.
  */
-public class ImageUpload extends AsyncTask<Void, Void, Bitmap> {
+public class ImageUpload extends AsyncTask<Void, Void, String> {
 
     private static final String ITEMS_TAG = "items";
     private static final String TAG = "ImageUpload";
 
     String path;
-    Activity context;
+    Activity mContext;
+    MessageItem messageItem;
 
-    public ImageUpload(Activity context, String path){
+    SharedPreferences sharedPreferences;
+
+    public ImageUpload(Activity context, String path, MessageItem messageItem){
         this.path = path;
-        this.context = context;
+        this.mContext = context;
+        this.messageItem = messageItem;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     @Override
-    protected Bitmap doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         String data = "";
         HttpURLConnection httpUrlConnection = null;
+        String imgURL = null;
 
         try {
             httpUrlConnection = (HttpURLConnection) new URL(Constants.UPLOAD_FORM_URL)
@@ -76,6 +79,7 @@ public class ImageUpload extends AsyncTask<Void, Void, Bitmap> {
             if (null != httpUrlConnection)
                 httpUrlConnection.disconnect();
         }
+
         String imgUploadURL = data;
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
@@ -88,47 +92,20 @@ public class ImageUpload extends AsyncTask<Void, Void, Bitmap> {
                 .url(imgUploadURL)
                 .post(requestBody)
                 .build();
-        String kk="";
         try {
             Response response = client.newCall(request).execute();
-            kk = response.body().string();
-            Log.d("response", "uploadImage:"+kk);
+            imgURL = response.body().string();
+            Log.d("response", "uploadImage:"+imgURL);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //Todo: Delete from here
-        Bitmap avatar = null;
-
-        httpUrlConnection = null;
-
-        try {
-            httpUrlConnection = (HttpURLConnection) new URL(Constants.DOWNLOAD_IMG_URL + kk)
-                    .openConnection();
-
-            switch (httpUrlConnection.getResponseCode()){
-                case HttpURLConnection.HTTP_OK:
-                    InputStream in = new BufferedInputStream(
-                            httpUrlConnection.getInputStream());
-
-                    avatar = BitmapFactory.decodeStream(in);
-                    break;
-            }
-
-        } catch (MalformedURLException exception) {
-            Log.e(TAG, "MalformedURLException");
-        } catch (IOException exception) {
-            Log.e(TAG, "IOException");
-        } finally {
-            if (null != httpUrlConnection)
-                httpUrlConnection.disconnect();
-        }
-
-        return avatar;
+        return imgURL;
     }
 
     @Override
-    protected void onPostExecute(Bitmap img) {
-        ChatActivity.startImageDownload(img);
+    protected void onPostExecute(String imgURL) {
+        messageItem.setMsg(imgURL);
+        ChatActivity.sendMessage(messageItem);
     }
 
     private String readStream(InputStream in) {
