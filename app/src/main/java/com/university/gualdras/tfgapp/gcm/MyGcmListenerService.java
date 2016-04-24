@@ -2,7 +2,6 @@ package com.university.gualdras.tfgapp.gcm;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -13,9 +12,8 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
-import com.university.gualdras.tfgapp.domain.ImageDownload;
+import com.university.gualdras.tfgapp.domain.network.ImageDownloadTask;
 import com.university.gualdras.tfgapp.domain.MessageItem;
-import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
 
 /**
@@ -60,7 +58,7 @@ public class MyGcmListenerService extends GcmListenerService {
         MessageItem messageItem = new MessageItem(from, type, msg);
 
         if(type.equals(MessageItem.IMG_TYPE)){
-            new ImageDownload(this, messageItem).execute();
+            new ImageDownloadTask(this, messageItem).execute();
         }
         else {
             messageItem.saveMessageReceived(this);

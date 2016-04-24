@@ -145,13 +145,12 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String profileEmail = args.getString(DataProvider.COL_PHONE_NUMBER);
-        CursorLoader loader = new CursorLoader(getActivity(),
+        return new CursorLoader(getActivity(),
                 DataProvider.CONTENT_URI_MESSAGES,
                 null,
                 DataProvider.COL_FROM + " = ? or " + DataProvider.COL_TO + " = ?",
                 new String[]{profileEmail, profileEmail},
                 DataProvider.COL_AT + " DESC");
-        return loader;
     }
 
     @Override
@@ -163,6 +162,10 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }
+
+
+
+
 
     public Bitmap decodeSampledBitmapFromPath(String path, int reqWidth, int reqHeight) {
 

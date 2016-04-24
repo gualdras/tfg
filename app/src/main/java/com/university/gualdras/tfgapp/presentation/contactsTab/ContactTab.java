@@ -26,7 +26,7 @@ import android.widget.SimpleCursorAdapter;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.RefreshContactsTask;
+import com.university.gualdras.tfgapp.domain.network.RefreshContactsTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
@@ -117,13 +117,12 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getActivity(),
+        return new CursorLoader(getActivity(),
                 DataProvider.CONTENT_URI_PROFILE,
                 new String[]{DataProvider.COL_ID, DataProvider.COL_NAME, DataProvider.COL_PHOTO},
                 null,
                 null,
                 DataProvider.COL_ID + " DESC");
-        return loader;
     }
 
     @Override

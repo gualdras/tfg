@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp.domain;
+package com.university.gualdras.tfgapp.domain.network;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -14,6 +14,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
+import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
@@ -116,7 +117,7 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             int code = httpURLConnection.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
                 InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
-                data = readStream(in);
+                data = NetworkUtils.readStream(in);
                 error = false;
             }
 
@@ -179,7 +180,7 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
                         photo = Constants.DEFAULT_CONTACT_PHOTO;
                     }
                 }
-                if (cursor != null && !cursor.isClosed()) {
+                if (!cursor.isClosed()) {
                     cursor.close();
                 }
                 result.add(new ContactItem(photo, contactName, phoneNumber));
@@ -188,28 +189,5 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             e.printStackTrace();
         }
         return result;
-    }
-
-    private String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer data = new StringBuffer("");
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                data.append(line);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "IOException");
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return data.toString();
     }
 }

@@ -1,9 +1,10 @@
-package com.university.gualdras.tfgapp.domain;
+package com.university.gualdras.tfgapp.domain.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.gcm.ServerComunication;
 
 import org.json.JSONObject;

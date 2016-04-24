@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp.domain;
+package com.university.gualdras.tfgapp.domain.network;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
 import java.io.BufferedInputStream;
@@ -29,7 +30,7 @@ import okhttp3.Response;
 /**
  * Created by gualdras on 9/03/16.
  */
-public class ImageUpload extends AsyncTask<Void, Void, String> {
+public class ImageUploadTask extends AsyncTask<Void, Void, String> {
 
     private static final String ITEMS_TAG = "items";
     private static final String TAG = "ImageUpload";
@@ -40,7 +41,7 @@ public class ImageUpload extends AsyncTask<Void, Void, String> {
 
     SharedPreferences sharedPreferences;
 
-    public ImageUpload(Activity context, String path, MessageItem messageItem){
+    public ImageUploadTask(Activity context, String path, MessageItem messageItem){
         this.path = path;
         this.mContext = context;
         this.messageItem = messageItem;
@@ -62,12 +63,12 @@ public class ImageUpload extends AsyncTask<Void, Void, String> {
                     InputStream in = new BufferedInputStream(
                             httpUrlConnection.getInputStream());
 
-                    data = readStream(in);
+                    data = NetworkUtils.readStream(in);
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
 
-                    data = readStream(err);
+                    data = NetworkUtils.readStream(err);
                     break;
             }
 
@@ -84,7 +85,7 @@ public class ImageUpload extends AsyncTask<Void, Void, String> {
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "victor.png", RequestBody.create(MediaType.parse("image/png"), new File(path)))
+                .addFormDataPart("file", "image.png", RequestBody.create(MediaType.parse("image/png"), new File(path)))
                 .addFormDataPart("title", "My photo")
                 .build();
 
@@ -106,29 +107,6 @@ public class ImageUpload extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String imgURL) {
         messageItem.setMsg(imgURL);
         ChatActivity.sendMessage(messageItem);
-    }
-
-    private String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer data = new StringBuffer("");
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                data.append(line);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "IOException");
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return data.toString();
     }
 }
 

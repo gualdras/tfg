@@ -1,4 +1,4 @@
-package com.university.gualdras.tfgapp.domain;
+package com.university.gualdras.tfgapp.domain.network;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.domain.MessageItem;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -23,12 +24,12 @@ import java.net.URL;
 /**
  * Created by gualdras on 29/03/16.
  */
-public class ImageDownload extends AsyncTask<Void, Void, String> {
+public class ImageDownloadTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ImageDownload";
     Context mContext;
     MessageItem messageItem;
 
-    public ImageDownload(Context context, MessageItem messageItem){
+    public ImageDownloadTask(Context context, MessageItem messageItem){
         this.mContext = context;
         this.messageItem = messageItem;
     }

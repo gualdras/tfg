@@ -8,7 +8,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,9 +24,9 @@ import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.ImageUpload;
+import com.university.gualdras.tfgapp.domain.network.ImageUploadTask;
 import com.university.gualdras.tfgapp.domain.MessageItem;
-import com.university.gualdras.tfgapp.domain.SendMessageTask;
+import com.university.gualdras.tfgapp.domain.network.SendMessageTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
@@ -40,7 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by gualdras on 22/09/15.
  */
-public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageUploadListener {
+public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener {
 
     private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
@@ -152,7 +151,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     // Methods called by other class to respond to events occurred in this activity
 
 
-    public void onWriteMsgSelection() {
+/*    public void onWriteMsgSelection() {
 
         // Get a reference to the FragmentManager
         mFragmentManager = getFragmentManager();
@@ -169,28 +168,35 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         // Commit the FragmentTransaction
         fragmentTransaction.commit();
         mFragmentManager.executePendingTransactions();
+    }*/
+
+    @Override
+    public void onWriteMsgSelection() {
+        Intent intent = new Intent(this, KK.class);
+        startActivity(intent);
     }
-/*
-    public void onImgSelection() {
-        mFragmentManager = getFragmentManager();
 
-        // Start a new FragmentTransaction
-        FragmentTransaction fragmentTransaction = mFragmentManager
-                .beginTransaction();
+    /*
+        public void onImgSelection() {
+            mFragmentManager = getFragmentManager();
 
-        fragmentTransaction.remove(mWritableOptions);
-        // Add the TitleFragment to the layout
-        fragmentTransaction.add(R.id.fragment_container, mGallery);
-        fragmentTransaction.addToBackStack(null);
+            // Start a new FragmentTransaction
+            FragmentTransaction fragmentTransaction = mFragmentManager
+                    .beginTransaction();
 
-        // Commit the FragmentTransaction
-        fragmentTransaction.commit();
+            fragmentTransaction.remove(mWritableOptions);
+            // Add the TitleFragment to the layout
+            fragmentTransaction.add(R.id.fragment_container, mGallery);
+            fragmentTransaction.addToBackStack(null);
 
-        mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
-        mFragmentManager.executePendingTransactions();
-    }
-*/
+            // Commit the FragmentTransaction
+            fragmentTransaction.commit();
+
+            mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
+            mFragmentManager.executePendingTransactions();
+        }
+    */
     public void onImgSelection(){
             Intent chooserIntent = new Intent(Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -228,7 +234,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
                 Uri uri = data.getData();
                 String path = getRealPathFromURI(uri);
                 messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
-                new ImageUpload(this, path, messageItem).execute();
+                new ImageUploadTask(this, path, messageItem).execute();
             }
         }
     }
@@ -253,12 +259,6 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     public static void sendMessage(MessageItem messageItem) {
         new SendMessageTask(mContext, messageItem).execute();
-    }
-
-    @Override
-    public void onImageUpload(String imgURL) {
-        MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, imgURL);
-        sendMessage(messageItem);
     }
 }
 
