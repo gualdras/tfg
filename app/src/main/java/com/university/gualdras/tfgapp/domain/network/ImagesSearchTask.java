@@ -39,6 +39,8 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
         ArrayList<Bitmap> bitmaps = new ArrayList<>();
         Customsearch customsearch = new Customsearch(new NetHttpTransport(), new JacksonFactory(), null);
         com.google.api.services.customsearch.Customsearch.Cse.List list;
+        Search results;
+        List<Result> items;
 
         try {
             list = customsearch.cse().list(keyWords);
@@ -46,25 +48,22 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
             list.setCx(cx);
             list.setSearchType("image");
 
-            Search results = list.execute();
-            List<Result> items = results.getItems();
+            results = list.execute();
+            items = results.getItems();
 
             for (int i= 0; i<15 || i < items.size(); i++) {
                 HttpURLConnection httpUrlConnection = (HttpURLConnection) new URL(items.get(i).getLink())
                         .openConnection();
 
-
                 InputStream in = new BufferedInputStream(
                         httpUrlConnection.getInputStream());
 
                 bitmaps.add(BitmapFactory.decodeStream(in));
-
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         return bitmaps;
     }
 

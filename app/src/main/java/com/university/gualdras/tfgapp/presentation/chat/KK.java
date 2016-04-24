@@ -42,7 +42,6 @@ public class KK extends Activity {
 
         // Add the TitleFragment to the layout
         fragmentTransaction.add(R.id.img_search_fragment, mFilterImagesFragment);
-        fragmentTransaction.addToBackStack(null);
 
         // Commit the FragmentTransaction
         fragmentTransaction.commit();

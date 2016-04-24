@@ -15,8 +15,8 @@ public class NetworkUtils {
         BufferedReader reader = null;
         StringBuffer data = new StringBuffer("");
         try {
-            reader = new BufferedReader(new InputStreamReader(in));
             String line;
+            reader = new BufferedReader(new InputStreamReader(in));
             while ((line = reader.readLine()) != null) {
                 data.append(line);
             }

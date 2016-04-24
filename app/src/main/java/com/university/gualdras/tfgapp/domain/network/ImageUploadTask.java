@@ -11,11 +11,9 @@ import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,9 +48,15 @@ public class ImageUploadTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... params) {
-        String data = "";
+        String blobURL = getBlobURL();
+        String imgURL = uploadImage(blobURL);
+
+        return imgURL;
+    }
+
+    private String getBlobURL(){
+        String blobUrl = "";
         HttpURLConnection httpUrlConnection = null;
-        String imgURL = null;
 
         try {
             httpUrlConnection = (HttpURLConnection) new URL(Constants.UPLOAD_FORM_URL)
@@ -63,12 +67,12 @@ public class ImageUploadTask extends AsyncTask<Void, Void, String> {
                     InputStream in = new BufferedInputStream(
                             httpUrlConnection.getInputStream());
 
-                    data = NetworkUtils.readStream(in);
+                    blobUrl = NetworkUtils.readStream(in);
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
 
-                    data = NetworkUtils.readStream(err);
+                    blobUrl = NetworkUtils.readStream(err);
                     break;
             }
 
@@ -81,7 +85,11 @@ public class ImageUploadTask extends AsyncTask<Void, Void, String> {
                 httpUrlConnection.disconnect();
         }
 
-        String imgUploadURL = data;
+        return blobUrl;
+    }
+
+    private String uploadImage(String imgUploadURL){
+        String imgURL = "";
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)

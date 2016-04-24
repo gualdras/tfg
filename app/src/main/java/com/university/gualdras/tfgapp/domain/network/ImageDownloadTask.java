@@ -1,6 +1,5 @@
 package com.university.gualdras.tfgapp.domain.network;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
@@ -74,12 +73,13 @@ public class ImageDownloadTask extends AsyncTask<Void, Void, String> {
     }
 
     private String getRealPathFromURI(Uri contentUri) {
+        String result;
         String[] proj = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
         Cursor cursor = loader.loadInBackground();
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        String result = cursor.getString(column_index);
+        result = cursor.getString(column_index);
         cursor.close();
         return result;
     }

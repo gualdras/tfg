@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -24,10 +25,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
@@ -58,29 +57,34 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
         Cursor phones = null;
 
         ContentResolver cr = mContext.getContentResolver();
+        Cursor users = cr.query(DataProvider.CONTENT_URI_PROFILE, new String[]{DataProvider.COL_PHONE_NUMBER}, null, null, null);
         Cursor contacts = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
-        if (contacts.getCount() > 0) {
+        //Add contacts to contactsAlreadyChecked that are already users
+        if(users!= null){
+            while (users.moveToNext()){
+                contactsAlreadyChecked.add(users.getString(users.getColumnIndex(DataProvider.COL_PHONE_NUMBER)));
+            }
+        }
+        if (contacts != null && contacts.getCount() > 0) {
             while (contacts.moveToNext()) {
                 contactId = contacts.getString(contacts.getColumnIndex(ContactsContract.Contacts._ID));
                 phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
 
-                while (phones.moveToNext()) {
+                while (phones != null && phones.moveToNext()) {
                     String unformattedNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
+                    TelephonyManager manager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                    String countryID = manager.getSimCountryIso().toUpperCase().trim();
                     try {
-                        numberProto = phoneUtil.parse(unformattedNumber, "ES");
+                        numberProto = phoneUtil.parse(unformattedNumber, countryID);
                     } catch (NumberParseException e) {
                         e.printStackTrace();
                     }
 
                     if (phoneUtil.isValidNumber(numberProto)) {
-                        int countryCode = numberProto.getCountryCode();
-                        long nationalNumber = numberProto.getNationalNumber();
-
-                        completeNumber = Long.toString(countryCode) + Long.toString(nationalNumber);
-
+                        completeNumber = Long.toString(numberProto.getCountryCode()) + Long.toString(numberProto.getNationalNumber());
 
                         if (!contactsAlreadyChecked.contains(completeNumber)) {
                             contactsAlreadyChecked.add(completeNumber);
@@ -103,7 +107,7 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             phones.close();
         }
 
-        if (!contacts.isClosed()) {
+        if (contacts != null && !contacts.isClosed()) {
             contacts.close();
         }
         try {
