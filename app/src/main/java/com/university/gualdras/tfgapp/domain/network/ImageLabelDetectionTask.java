@@ -1,5 +1,6 @@
 package com.university.gualdras.tfgapp.domain.network;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,7 +19,6 @@ import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.university.gualdras.tfgapp.domain.LabeledImage;
-import com.university.gualdras.tfgapp.presentation.chat.KK;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,15 +28,19 @@ import java.util.List;
 /**
  * Created by gualdras on 22/04/16.
  */
-public class LabelImageDetectionTask extends AsyncTask <Void, Void, ArrayList<LabeledImage>> {
+public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<LabeledImage>> {
     private static final String TAG = "ImageFilter";
     private static final String CLOUD_VISION_API_KEY = "AIzaSyCnc9PEMEajUk4E0zfT9CbMC1muNlMtwss";
 
     ArrayList<Bitmap> bitmaps;
+    ImageLabeledListener mListener;
 
-    public LabelImageDetectionTask(ArrayList<Bitmap> bitmaps) {
+    public ImageLabelDetectionTask(ArrayList<Bitmap> bitmaps, Activity activity) {
         this.bitmaps = bitmaps;
+        this.mListener = (ImageLabeledListener) activity;
     }
+
+
 
     @Override
     protected ArrayList<LabeledImage> doInBackground(Void... params) {
@@ -100,7 +104,7 @@ public class LabelImageDetectionTask extends AsyncTask <Void, Void, ArrayList<La
 
     @Override
     protected void onPostExecute(ArrayList<LabeledImage> imagesLabeled) {
-        KK.addLabeledImage(imagesLabeled);
+        mListener.onImageLabeled(imagesLabeled);
     }
 
     private ArrayList<LabeledImage> convertResponseToString(BatchAnnotateImagesResponse responses) {

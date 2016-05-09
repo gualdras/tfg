@@ -8,6 +8,8 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,8 +26,10 @@ import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.network.ImageUploadTask;
+import com.university.gualdras.tfgapp.domain.LabeledImage;
 import com.university.gualdras.tfgapp.domain.MessageItem;
+import com.university.gualdras.tfgapp.domain.network.ImageLabelDetectionTask;
+import com.university.gualdras.tfgapp.domain.network.ImageLabeledListener;
 import com.university.gualdras.tfgapp.domain.network.SendMessageTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
@@ -39,7 +43,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by gualdras on 22/09/15.
  */
-public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener {
+public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageLabeledListener {
 
     private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
@@ -231,10 +235,18 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         }
         else {
             if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
+                ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
                 Uri uri = data.getData();
                 String path = getRealPathFromURI(uri);
+
+                /*This send the image
                 messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
-                new ImageUploadTask(this, path, messageItem).execute();
+                new ImageUploadTask(this, path, messageItem).execute();*/
+
+                //This is for labeling an image
+                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                bitmaps.add(bitmap);
+                new ImageLabelDetectionTask(bitmaps, this).execute();
             }
         }
     }
@@ -259,6 +271,12 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     public static void sendMessage(MessageItem messageItem) {
         new SendMessageTask(mContext, messageItem).execute();
+    }
+
+    @Override
+    public void onImageLabeled(ArrayList<LabeledImage> labeledImages) {
+        sendMessage(new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), getContactNumber(), MessageItem.TEXT_TYPE, labeledImages.get(0).getLabels()));
+
     }
 }
 

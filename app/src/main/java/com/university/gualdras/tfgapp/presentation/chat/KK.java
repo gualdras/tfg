@@ -3,22 +3,19 @@ package com.university.gualdras.tfgapp.presentation.chat;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ListActivity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.domain.LabeledImage;
+import com.university.gualdras.tfgapp.domain.network.ImageLabeledListener;
+import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
 
 import java.util.ArrayList;
 
 /**
  * Created by gualdras on 13/04/16.
  */
-public class KK extends Activity {
+public class KK extends Activity implements FilterImagesFragment.OnFragmentInteractionListener, ImageLabeledListener {
 
     private FragmentManager mFragmentManager;
     FilterImagesFragment mFilterImagesFragment = new FilterImagesFragment();
@@ -48,6 +45,16 @@ public class KK extends Activity {
     }
 
     public static void addLabeledImage(ArrayList<LabeledImage> labeledImages){
+        mKkImagesFragment.add(labeledImages);
+    }
+
+    @Override
+    public void searchAction(String text) {
+        new ImagesSearchTask(text, this).execute();
+    }
+
+    @Override
+    public void onImageLabeled(ArrayList<LabeledImage> labeledImages) {
         mKkImagesFragment.add(labeledImages);
     }
 }

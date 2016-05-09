@@ -1,5 +1,6 @@
 package com.university.gualdras.tfgapp.presentation.chat;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
 
 /**
  * Created by gualdras on 17/04/16.
@@ -19,6 +19,17 @@ import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
 public class FilterImagesFragment extends Fragment{
     EditText mEditText;
     Button sendBtn;
+    OnFragmentInteractionListener mListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +52,7 @@ public class FilterImagesFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 if(mEditText.getText().toString().trim().length() != 0) {
-                    new ImagesSearchTask(mEditText.getText().toString().trim()).execute();
+                    mListener.searchAction(mEditText.getText().toString().trim());
                     mEditText.getText().clear();
                 }
             }
@@ -49,5 +60,9 @@ public class FilterImagesFragment extends Fragment{
         mEditText.requestFocus();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+
+    public interface OnFragmentInteractionListener {
+        void searchAction(String text);
     }
 }

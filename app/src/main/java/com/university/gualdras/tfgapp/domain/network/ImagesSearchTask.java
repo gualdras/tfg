@@ -1,8 +1,10 @@
 package com.university.gualdras.tfgapp.domain.network;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -29,9 +31,11 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
     private static final String key = "AIzaSyCFo39giOeV_OH0rE6_H7BWgGNisAeI5UM";
 
     String keyWords;
+    Activity activity;
 
-    public ImagesSearchTask(String keyWords) {
+    public ImagesSearchTask(String keyWords, Activity activity) {
         this.keyWords = keyWords;
+        this.activity = activity;
     }
 
     @Override
@@ -51,7 +55,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
             results = list.execute();
             items = results.getItems();
 
-            for (int i= 0; i<15 || i < items.size(); i++) {
+            for (int i = 0; i<15 && i < items.size(); i++) {
                 HttpURLConnection httpUrlConnection = (HttpURLConnection) new URL(items.get(i).getLink())
                         .openConnection();
 
@@ -69,6 +73,10 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
 
     @Override
     protected void onPostExecute(ArrayList<Bitmap> bitmaps) {
-        new LabelImageDetectionTask(bitmaps).execute();
+        if(bitmaps != null){
+            new ImageLabelDetectionTask(bitmaps, activity).execute();
+        } else{
+            Toast.makeText(activity, "No results", Toast.LENGTH_SHORT);
+        }
     }
 }

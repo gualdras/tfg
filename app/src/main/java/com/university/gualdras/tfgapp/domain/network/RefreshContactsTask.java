@@ -18,6 +18,7 @@ import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
+import com.university.gualdras.tfgapp.presentation.contactsTab.ContactTab;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -139,6 +140,7 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
         if (!error) {
             updateContacts(response);
         }
+        ContactTab.OnRefreshContactsFinish();
     }
 
     private void updateContacts(String response) {

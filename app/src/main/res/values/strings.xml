@@ -12,6 +12,9 @@
     <string name="phonenumber_dialog_title">Phone number</string>
     <string name="enter_phone_number">Please, introduce your phone number</string>
     <string name="speech_recognition_hint">Speak now</string>
+    <string name="progress_install_title">Installation progress</string>
+    <string name="progress_install_gcm">Registering your device...</string>
+    <string name="progress_checking_contacts">Updating your contacts...</string>
 
 
     <string-array name="CountryCodes" >

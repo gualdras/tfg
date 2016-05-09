@@ -2,7 +2,6 @@ package com.university.gualdras.tfgapp.presentation.chat;
 
 import android.app.ListFragment;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.domain.ContactItem;
 import com.university.gualdras.tfgapp.domain.LabeledImage;
 
 import java.util.ArrayList;
@@ -21,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Created by gualdras on 13/04/16.
  */
-public class KKImagesFragment extends ListFragment {
+public class KKImagesFragment extends ListFragment{
 
     ImageLabelsAdapter mAdapter;
 
@@ -44,8 +42,6 @@ public class KKImagesFragment extends ListFragment {
             mAdapter.add(labeledImage);
         }
     }
-
-
 }
 
  class ImageLabelsAdapter extends BaseAdapter {
@@ -101,7 +97,7 @@ public class KKImagesFragment extends ListFragment {
              holder = (ViewHolder) newView.getTag();
          }
 
-
+         holder.labels.setTextSize(10);
          holder.labels.setText(curr.getLabels());
          holder.image.setImageBitmap(curr.getImage());
 

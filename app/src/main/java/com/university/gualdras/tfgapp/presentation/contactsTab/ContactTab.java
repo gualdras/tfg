@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 
 import com.university.gualdras.tfgapp.Constants;
@@ -41,7 +42,7 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
     //private ContactListAdapter contactListAdapter;
 
     private SimpleCursorAdapter adapter;
-
+    static MenuItem refreshContactMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,8 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         switch (item.getItemId()) {
 
             case R.id.refresh_menu_item:
+                refreshContactMenu = item;
+                item.setActionView(new ProgressBar(getContext()));
                 new RefreshContactsTask().execute(mContext);
                 result = true;
                 break;
@@ -112,6 +115,10 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
         }
 
         return result;
+    }
+
+    public static void OnRefreshContactsFinish(){
+        refreshContactMenu.setActionView(null);
     }
 
 

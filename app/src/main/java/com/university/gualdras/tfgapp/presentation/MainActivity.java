@@ -1,29 +1,20 @@
 package com.university.gualdras.tfgapp.presentation;
 
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
-import com.university.gualdras.tfgapp.gcm.Preferences;
-import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,9 +24,6 @@ public class MainActivity extends AppCompatActivity {
     final int[] NAME_TABS = {R.string.settings_tab, R.string.recent_chats_tab, R.string.contacts_tab};
 
     private static final String TAG = "MainActivity";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     SharedPreferences sharedPreferences;
     private static Context mContext;
@@ -85,34 +73,9 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setCurrentItem(1);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        //gcm stuff
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences
-                        .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    Toast.makeText(context, "Registered", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
         
         mContext = this;
-
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Preferences.REGISTRATION_COMPLETE));
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -137,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(Constants.FIRST_TIME, false);
             editor.apply();
-
-            registrationIntent();
         }
         else {
             if(requestCode == Constants.INSTALL_CODE && resultCode == RESULT_CANCELED){
@@ -146,33 +107,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    private void registrationIntent(){
-        if (checkPlayServices()) {
-            // Start IntentService to register this application with GCM.
-            //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
-            //}
-        }
-    }
-
-    private boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-                        .show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    //Todo: Check also if there is microphone
-
 }
