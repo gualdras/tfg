@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
-import com.university.gualdras.tfgapp.domain.network.ImageDownloadTask;
+import com.university.gualdras.tfgapp.domain.network.ReceivedImageDownloadTask;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
 
@@ -58,7 +58,7 @@ public class MyGcmListenerService extends GcmListenerService {
         MessageItem messageItem = new MessageItem(from, type, msg);
 
         if(type.equals(MessageItem.IMG_TYPE)){
-            new ImageDownloadTask(this, messageItem).execute();
+            new ReceivedImageDownloadTask(this, messageItem).execute();
         }
         else {
             messageItem.saveMessageReceived(this);

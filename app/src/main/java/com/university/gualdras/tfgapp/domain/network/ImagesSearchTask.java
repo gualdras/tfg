@@ -1,10 +1,7 @@
 package com.university.gualdras.tfgapp.domain.network;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -12,18 +9,13 @@ import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by gualdras on 17/04/16.
  */
-public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
+public class ImagesSearchTask extends AsyncTask<Void, Void, List<Result>> {
     private static final String TAG = "ImagesSearch";
 
 
@@ -31,20 +23,19 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
     private static final String key = "AIzaSyCFo39giOeV_OH0rE6_H7BWgGNisAeI5UM";
 
     String keyWords;
-    Activity activity;
+    ImageSearchListener mListener;
 
     public ImagesSearchTask(String keyWords, Activity activity) {
         this.keyWords = keyWords;
-        this.activity = activity;
+        this.mListener = (ImageSearchListener) activity;
     }
 
     @Override
-    protected ArrayList<Bitmap> doInBackground(Void... params) {
-        ArrayList<Bitmap> bitmaps = new ArrayList<>();
+    protected List<Result> doInBackground(Void... params) {
         Customsearch customsearch = new Customsearch(new NetHttpTransport(), new JacksonFactory(), null);
         com.google.api.services.customsearch.Customsearch.Cse.List list;
         Search results;
-        List<Result> items;
+        List<Result> searchResults = null;
 
         try {
             list = customsearch.cse().list(keyWords);
@@ -53,9 +44,9 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
             list.setSearchType("image");
 
             results = list.execute();
-            items = results.getItems();
+            searchResults = results.getItems();
 
-            for (int i = 0; i<15 && i < items.size(); i++) {
+            /*for (int i = 0; i<15 && i < items.size(); i++) {
                 HttpURLConnection httpUrlConnection = (HttpURLConnection) new URL(items.get(i).getLink())
                         .openConnection();
 
@@ -63,20 +54,18 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, ArrayList<Bitmap>> {
                         httpUrlConnection.getInputStream());
 
                 bitmaps.add(BitmapFactory.decodeStream(in));
-            }
+            }*/
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return bitmaps;
+        return searchResults;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Bitmap> bitmaps) {
-        if(bitmaps != null){
-            new ImageLabelDetectionTask(bitmaps, activity).execute();
-        } else{
-            Toast.makeText(activity, "No results", Toast.LENGTH_SHORT);
+    protected void onPostExecute(List<Result> searchResults) {
+        if(searchResults != null){
+            mListener.onImageSearchCompleted(searchResults);
         }
     }
 }

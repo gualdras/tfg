@@ -40,8 +40,6 @@
         <activity android:name=".presentation.InstallActivity"
             android:noHistory="true"/>
 
-        <activity android:name=".presentation.chat.KK"/>
-
 
         <provider
             android:name=".persistence.DataProvider"

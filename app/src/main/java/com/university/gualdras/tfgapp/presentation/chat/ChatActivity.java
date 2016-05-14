@@ -4,7 +4,6 @@ package com.university.gualdras.tfgapp.presentation.chat;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -17,24 +16,26 @@ import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.api.services.customsearch.model.Result;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.Utils;
 import com.university.gualdras.tfgapp.domain.LabeledImage;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.domain.network.ImageLabelDetectionTask;
 import com.university.gualdras.tfgapp.domain.network.ImageLabeledListener;
+import com.university.gualdras.tfgapp.domain.network.ImageSearchListener;
 import com.university.gualdras.tfgapp.domain.network.SendMessageTask;
+import com.university.gualdras.tfgapp.domain.network.SuggestedImageListener;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -43,7 +44,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by gualdras on 22/09/15.
  */
-public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageLabeledListener {
+public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageLabeledListener, ImageSearchListener, SuggestedImageListener {
 
     private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
@@ -53,7 +54,6 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     private FragmentManager mFragmentManager;
     private FrameLayout mFrameLayout;
-    private GalleryFragment mGallery = new GalleryFragment();
     private WriteMessageFragment mWriteMessage = new WriteMessageFragment();
     private WritableOptionsFragment mWritableOptions = new WritableOptionsFragment();
 
@@ -124,14 +124,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     @Override
     public void onBackPressed() {
 
-        if (mWriteMessage.isAdded() || mGallery.isAdded()) {
-            if (mGallery.isAdded()) {
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                params.gravity = Gravity.BOTTOM;
-                mFrameLayout.setLayoutParams(params);
-            }
+        if (mWriteMessage.isAdded()) {
             mFragmentManager = getFragmentManager();
 
             // Start a new FragmentTransaction
@@ -149,13 +142,12 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         } else {
             super.onBackPressed();
         }
-
     }
 
     // Methods called by other class to respond to events occurred in this activity
 
 
-/*    public void onWriteMsgSelection() {
+   public void onWriteMsgSelection() {
 
         // Get a reference to the FragmentManager
         mFragmentManager = getFragmentManager();
@@ -172,13 +164,13 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         // Commit the FragmentTransaction
         fragmentTransaction.commit();
         mFragmentManager.executePendingTransactions();
-    }*/
+    }
 
-    @Override
+    /*@Override
     public void onWriteMsgSelection() {
         Intent intent = new Intent(this, KK.class);
         startActivity(intent);
-    }
+    }*/
 
     /*
         public void onImgSelection() {
@@ -237,7 +229,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
             if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
                 ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
                 Uri uri = data.getData();
-                String path = getRealPathFromURI(uri);
+                String path = Utils.getRealPathFromURI(this, uri);
 
                 /*This send the image
                 messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
@@ -252,17 +244,6 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     }
 
 
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String result = cursor.getString(column_index);
-        cursor.close();
-        return result;
-    }
-
     @Override
     public String getContactNumber() {
         return contactPhoneNumber;
@@ -276,7 +257,16 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     @Override
     public void onImageLabeled(ArrayList<LabeledImage> labeledImages) {
         sendMessage(new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), getContactNumber(), MessageItem.TEXT_TYPE, labeledImages.get(0).getLabels()));
+    }
 
+    @Override
+    public void onImageSearchCompleted(List<Result> searchResults) {
+        mWriteMessage.ImageSearchCompleted(searchResults);
+    }
+
+    @Override
+    public void onSuggestedImageDownloadFinish(Bitmap bitmap) {
+        mWriteMessage.SuggestedImageDownload(bitmap);
     }
 }
 

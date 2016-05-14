@@ -1,8 +1,6 @@
 package com.university.gualdras.tfgapp.domain.network;
 
 import android.content.Context;
-import android.content.CursorLoader;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -11,6 +9,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.Utils;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 
 import java.io.BufferedInputStream;
@@ -23,12 +22,12 @@ import java.net.URL;
 /**
  * Created by gualdras on 29/03/16.
  */
-public class ImageDownloadTask extends AsyncTask<Void, Void, String> {
+public class ReceivedImageDownloadTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ImageDownload";
     Context mContext;
     MessageItem messageItem;
 
-    public ImageDownloadTask(Context context, MessageItem messageItem){
+    public ReceivedImageDownloadTask(Context context, MessageItem messageItem){
         this.mContext = context;
         this.messageItem = messageItem;
     }
@@ -67,20 +66,8 @@ public class ImageDownloadTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String imgPath) {
         Uri uri = Uri.parse(imgPath);
-        String path = getRealPathFromURI(uri);
+        String path = Utils.getRealPathFromURI(mContext,  uri);
         messageItem.setLocalResource(path);
         messageItem.saveMessageReceived(mContext);
-    }
-
-    private String getRealPathFromURI(Uri contentUri) {
-        String result;
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        result = cursor.getString(column_index);
-        cursor.close();
-        return result;
     }
 }
