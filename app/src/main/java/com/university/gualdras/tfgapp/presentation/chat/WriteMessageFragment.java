@@ -12,7 +12,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +34,7 @@ import java.util.List;
 /**
  * Created by gualdras on 12/10/15.
  */
-public class WriteMessageFragment extends Fragment{
+public class WriteMessageFragment extends Fragment {
 
     EditText mEditText;
     Button sendBtn;
@@ -54,6 +56,7 @@ public class WriteMessageFragment extends Fragment{
             throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
         }
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -62,21 +65,31 @@ public class WriteMessageFragment extends Fragment{
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.write_message_fragment, container, false);
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv_gallery);
+        recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv_gallery);
 
         mEditText = (EditText) getActivity().findViewById(R.id.et_write_message);
         mEditText.addTextChangedListener(new TextWatcher() {
             CountDownTimer timer = null;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                if(timer != null){
+                if(mAdapter != null){
+                    mAdapter.clear();
+                }
+                if (timer != null) {
                     timer.cancel();
                 }
                 timer = new CountDownTimer(1000, 1000) {
@@ -87,8 +100,8 @@ public class WriteMessageFragment extends Fragment{
 
                     @Override
                     public void onFinish() {
-                        if(s.length()>0) {
-                            new ImagesSearchTask(s.toString(), getActivity());
+                        if (s.length() > 0) {
+                            new ImagesSearchTask(s.toString(), getActivity()).execute();
                             Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -100,12 +113,13 @@ public class WriteMessageFragment extends Fragment{
 
             }
         });
+
         sendBtn = (Button) getActivity().findViewById(R.id.btn_send);
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Todo - change destinatary
-                if(mEditText.getText().toString().trim().length() != 0) {
+                if (mEditText.getText().toString().trim().length() != 0) {
                     MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), mListener.getContactNumber(), MessageItem.TEXT_TYPE, mEditText.getText().toString());
                     ChatActivity.sendMessage(messageItem);
                     mEditText.getText().clear();
@@ -118,7 +132,7 @@ public class WriteMessageFragment extends Fragment{
     }
 
     public void ImageSearchCompleted(List<Result> searchResults) {
-        for(int i=0; i<searchResults.size() && i<6; i++){
+        for (int i = 0; i < searchResults.size() && i < 6; i++) {
             new SuggestedImageDownload(getActivity(), searchResults.get(i).getLink()).execute();
         }
     }

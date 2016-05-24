@@ -32,7 +32,7 @@ class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.V
         // Inflate the custom layout
         View contactView = inflater.inflate(R.layout.image, parent, false);
 
-        // Return a new holder instance
+        // Return a new holder instanceD
         ViewHolder viewHolder = new ViewHolder(contactView);
         return viewHolder;
     }
