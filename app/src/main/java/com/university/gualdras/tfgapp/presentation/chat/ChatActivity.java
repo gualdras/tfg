@@ -11,11 +11,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,11 +30,11 @@ import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.Utils;
 import com.university.gualdras.tfgapp.domain.LabeledImage;
 import com.university.gualdras.tfgapp.domain.MessageItem;
+import com.university.gualdras.tfgapp.domain.network.ImageInteractionListener;
 import com.university.gualdras.tfgapp.domain.network.ImageLabelDetectionTask;
-import com.university.gualdras.tfgapp.domain.network.ImageLabeledListener;
-import com.university.gualdras.tfgapp.domain.network.ImageSearchListener;
+import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
 import com.university.gualdras.tfgapp.domain.network.SendMessageTask;
-import com.university.gualdras.tfgapp.domain.network.SuggestedImageListener;
+import com.university.gualdras.tfgapp.domain.network.SuggestedImageDownload;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
@@ -44,13 +48,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by gualdras on 22/09/15.
  */
-public class ChatActivity extends AppCompatActivity implements MessagesFragment.OnFragmentInteractionListener, OptionsSelectionListener, ImageLabeledListener, ImageSearchListener, SuggestedImageListener {
+public class ChatActivity extends AppCompatActivity implements ImageInteractionListener {
 
     private int SPEECH_CODE = 2134;
     private TextView contactNameTV;
     private CircleImageView profilePhotoIV;
 
     private Toolbar toolbar;
+
+    private RecyclerView recyclerView;
+    private SuggestedImageAdapter mAdapter;
+    CountDownTimer timer;
 
     private FragmentManager mFragmentManager;
     private FrameLayout mFrameLayout;
@@ -102,6 +110,9 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        recyclerView = (RecyclerView) findViewById(R.id.rv_gallery);
+
+
         mFrameLayout = (FrameLayout) findViewById(R.id.fragment_container);
 
         if(savedInstanceState == null) {
@@ -125,6 +136,7 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
     public void onBackPressed() {
 
         if (mWriteMessage.isAdded()) {
+            mAdapter.clear();
             mFragmentManager = getFragmentManager();
 
             // Start a new FragmentTransaction
@@ -166,47 +178,19 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         mFragmentManager.executePendingTransactions();
     }
 
-    /*@Override
-    public void onWriteMsgSelection() {
-        Intent intent = new Intent(this, KK.class);
-        startActivity(intent);
-    }*/
-
-    /*
-        public void onImgSelection() {
-            mFragmentManager = getFragmentManager();
-
-            // Start a new FragmentTransaction
-            FragmentTransaction fragmentTransaction = mFragmentManager
-                    .beginTransaction();
-
-            fragmentTransaction.remove(mWritableOptions);
-            // Add the TitleFragment to the layout
-            fragmentTransaction.add(R.id.fragment_container, mGallery);
-            fragmentTransaction.addToBackStack(null);
-
-            // Commit the FragmentTransaction
-            fragmentTransaction.commit();
-
-            mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
-            mFragmentManager.executePendingTransactions();
-        }
-    */
-    public void onImgSelection(){
-            Intent chooserIntent = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-            startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
-    }
-
-    @Override
     public void onSpeechRecognitionSelection() {
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, R.string.speech_recognition_hint);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().getDisplayLanguage());
         startActivityForResult(speechIntent, SPEECH_CODE);
+    }
+
+    public void onImgSelection(){
+            Intent chooserIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
     }
 
     @Override
@@ -243,12 +227,37 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
         }
     }
 
-
-    @Override
     public String getContactNumber() {
         return contactPhoneNumber;
     }
 
+    public void onTextChangedListener(final String text){
+        if(text.length() > 0 && recyclerView.getVisibility() == View.GONE){
+            recyclerView.setVisibility(View.VISIBLE);
+        } else{
+            if(text.length() == 0){
+                recyclerView.setVisibility(View.GONE);
+            }
+        }
+        if(mAdapter != null){
+            mAdapter.clear();
+        }
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new CountDownTimer(1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                if (text.length() > 0) {
+                    new ImagesSearchTask(text, ChatActivity.this).execute();
+                }
+            }
+        }.start();
+    }
 
     public static void sendMessage(MessageItem messageItem) {
         new SendMessageTask(mContext, messageItem).execute();
@@ -261,13 +270,50 @@ public class ChatActivity extends AppCompatActivity implements MessagesFragment.
 
     @Override
     public void onImageSearchCompleted(List<Result> searchResults) {
-        mWriteMessage.ImageSearchCompleted(searchResults);
+        for (int i = 0; i < searchResults.size() && i < 6; i++) {
+            new SuggestedImageDownload(this, searchResults.get(i).getLink()).execute();
+        }
     }
 
     @Override
     public void onSuggestedImageDownloadFinish(Bitmap bitmap) {
-        mWriteMessage.SuggestedImageDownload(bitmap);
+        if (mAdapter == null) {
+            ArrayList<Bitmap> arrayList = new ArrayList<>();
+            arrayList.add(bitmap);
+            mAdapter = new SuggestedImageAdapter(arrayList);
+            recyclerView.setAdapter(mAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        } else {
+            mAdapter.add(bitmap);
+        }
     }
 }
 
+/*@Override
+    public void onWriteMsgSelection() {
+        Intent intent = new Intent(this, KK.class);
+        startActivity(intent);
+    }*/
+
+    /*
+        public void onImgSelection() {
+            mFragmentManager = getFragmentManager();
+
+            // Start a new FragmentTransaction
+            FragmentTransaction fragmentTransaction = mFragmentManager
+                    .beginTransaction();
+
+            fragmentTransaction.remove(mWritableOptions);
+            // Add the TitleFragment to the layout
+            fragmentTransaction.add(R.id.fragment_container, mGallery);
+            fragmentTransaction.addToBackStack(null);
+
+            // Commit the FragmentTransaction
+            fragmentTransaction.commit();
+
+            mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
+            mFragmentManager.executePendingTransactions();
+        }
+    */
 

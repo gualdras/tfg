@@ -1,6 +1,5 @@
 package com.university.gualdras.tfgapp.presentation.chat;
 
-import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -21,36 +20,13 @@ import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 
 public class MessagesFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final DateFormat[] df = new DateFormat[]{
-            DateFormat.getDateInstance(), DateFormat.getTimeInstance()};
-
-    private OnFragmentInteractionListener mListener;
     private SimpleCursorAdapter adapter;
-    private Date now;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        now = new Date();
 
         adapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.chat_message_item,
@@ -109,33 +85,14 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
         getListView().setDivider(null);
 
         Bundle args = new Bundle();
-        args.putString(DataProvider.COL_PHONE_NUMBER, mListener.getContactNumber());
+        args.putString(DataProvider.COL_PHONE_NUMBER, ((ChatActivity)getActivity()).getContactNumber());
         getLoaderManager().initLoader(0, args, this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
-
-    public interface OnFragmentInteractionListener {
-        String getContactNumber();
-    }
-
-    private String getDisplayTime(String datetime) {
-        try {
-            Date dt = sdf.parse(datetime);
-            if (now.getYear() == dt.getYear() && now.getMonth() == dt.getMonth() && now.getDate() == dt.getDate()) {
-                return df[1].format(dt);
-            }
-            return df[0].format(dt);
-        } catch (ParseException e) {
-            return datetime;
-        }
-    }
-
-    //----------------------------------------------------------------------------
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -145,7 +102,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
                 null,
                 DataProvider.COL_FROM + " = ? or " + DataProvider.COL_TO + " = ?",
                 new String[]{profileEmail, profileEmail},
-                DataProvider.COL_AT + " DESC");
+                DataProvider.COL_AT + " ASC");
     }
 
     @Override
@@ -157,8 +114,6 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }
-
-
 
 
 

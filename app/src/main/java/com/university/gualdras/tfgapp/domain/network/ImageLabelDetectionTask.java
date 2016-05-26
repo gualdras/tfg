@@ -33,11 +33,11 @@ public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<La
     private static final String CLOUD_VISION_API_KEY = "AIzaSyCnc9PEMEajUk4E0zfT9CbMC1muNlMtwss";
 
     ArrayList<Bitmap> bitmaps;
-    ImageLabeledListener mListener;
+    ImageInteractionListener mListener;
 
     public ImageLabelDetectionTask(ArrayList<Bitmap> bitmaps, Activity activity) {
         this.bitmaps = bitmaps;
-        this.mListener = (ImageLabeledListener) activity;
+        this.mListener = (ImageInteractionListener) activity;
     }
 
 

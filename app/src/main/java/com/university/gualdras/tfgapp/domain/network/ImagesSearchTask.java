@@ -23,11 +23,11 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, List<Result>> {
     private static final String key = "AIzaSyCFo39giOeV_OH0rE6_H7BWgGNisAeI5UM";
 
     String keyWords;
-    ImageSearchListener mListener;
+    ImageInteractionListener mListener;
 
     public ImagesSearchTask(String keyWords, Activity activity) {
         this.keyWords = keyWords;
-        this.mListener = (ImageSearchListener) activity;
+        this.mListener = (ImageInteractionListener) activity;
     }
 
     @Override

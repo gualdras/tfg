@@ -1,6 +1,5 @@
 package com.university.gualdras.tfgapp.presentation.chat;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,20 +17,6 @@ public class WritableOptionsFragment extends Fragment {
 
     private ImageButton writeMsgBtn, selectImageBtn, speechRecognitionBtn;
 
-    private OptionsSelectionListener mListener;
-
-
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mListener = (OptionsSelectionListener) activity;
-
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OptionSelectionListener");
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,21 +37,21 @@ public class WritableOptionsFragment extends Fragment {
         writeMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onWriteMsgSelection();
+                ((ChatActivity)getActivity()).onWriteMsgSelection();
             }
         });
         selectImageBtn = (ImageButton) getActivity().findViewById(R.id.select_image_btn);
         selectImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onImgSelection();
+                ((ChatActivity)getActivity()).onImgSelection();
             }
         });
         speechRecognitionBtn = (ImageButton) getActivity().findViewById(R.id.speech_recognition_btn);
         speechRecognitionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSpeechRecognitionSelection();
+                ((ChatActivity)getActivity()).onSpeechRecognitionSelection();
             }
         });
     }

@@ -17,10 +17,10 @@ import java.net.URL;
 public class SuggestedImageDownload extends AsyncTask<Void, Void, Bitmap> {
 
     String link;
-    SuggestedImageListener mListener;
+    ImageInteractionListener mListener;
 
     public SuggestedImageDownload(Activity activity, String link){
-        this.mListener = (SuggestedImageListener) activity;
+        this.mListener = (ImageInteractionListener) activity;
         this.link = link;
     }
 
@@ -37,7 +37,6 @@ public class SuggestedImageDownload extends AsyncTask<Void, Void, Bitmap> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return bitmap;
     }
 

@@ -33,6 +33,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
         <fragment
             android:id="@+id/list_message"
             android:name="com.university.gualdras.tfgapp.presentation.chat.MessagesFragment"
@@ -41,6 +42,13 @@
             android:layout_weight="1"
             android:stackFromBottom="true"
             android:transcriptMode="alwaysScroll" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_weight="1"/>
 
         <FrameLayout
             android:id="@+id/fragment_container"
