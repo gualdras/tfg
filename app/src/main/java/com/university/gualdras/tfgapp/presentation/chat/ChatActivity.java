@@ -7,14 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,25 +19,26 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.api.services.customsearch.model.Result;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.Utils;
-import com.university.gualdras.tfgapp.domain.LabeledImage;
 import com.university.gualdras.tfgapp.domain.MessageItem;
+import com.university.gualdras.tfgapp.domain.SuggestedImage;
 import com.university.gualdras.tfgapp.domain.network.ImageInteractionListener;
 import com.university.gualdras.tfgapp.domain.network.ImageLabelDetectionTask;
 import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
 import com.university.gualdras.tfgapp.domain.network.SendMessageTask;
-import com.university.gualdras.tfgapp.domain.network.SuggestedImageDownload;
+import com.university.gualdras.tfgapp.domain.network.SuggestedImageDownloadTask;
+import com.university.gualdras.tfgapp.domain.network.UpdateImageTask;
+import com.university.gualdras.tfgapp.domain.network.UploadImageTask;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -76,6 +74,9 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     private int PICK_IMAGE_CODE = 0;
 
     SharedPreferences sharedPreferences;
+
+    ImagesSearchTask imagesSearchTask;
+    ArrayList<SuggestedImageDownloadTask> suggestedImageDownloadTasks = new ArrayList<>();
 
 
     @Override
@@ -136,7 +137,11 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     public void onBackPressed() {
 
         if (mWriteMessage.isAdded()) {
-            mAdapter.clear();
+            if(mAdapter != null)
+                mAdapter.clear();
+            if(recyclerView != null)
+                recyclerView.setVisibility(View.GONE);
+
             mFragmentManager = getFragmentManager();
 
             // Start a new FragmentTransaction
@@ -178,7 +183,7 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         mFragmentManager.executePendingTransactions();
     }
 
-    public void onSpeechRecognitionSelection() {
+    /*public void onSpeechRecognitionSelection() {
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, R.string.speech_recognition_hint);
@@ -215,9 +220,9 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
                 Uri uri = data.getData();
                 String path = Utils.getRealPathFromURI(this, uri);
 
-                /*This send the image
+                *//*This send the image
                 messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
-                new ImageUploadTask(this, path, messageItem).execute();*/
+                new ImageUploadTask(this, path, messageItem).execute();*//*
 
                 //This is for labeling an image
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
@@ -225,7 +230,7 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
                 new ImageLabelDetectionTask(bitmaps, this).execute();
             }
         }
-    }
+    }*/
 
     public String getContactNumber() {
         return contactPhoneNumber;
@@ -240,12 +245,18 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
             }
         }
         if(mAdapter != null){
+            if(imagesSearchTask != null)
+                imagesSearchTask.cancel(true);
+            for(SuggestedImageDownloadTask suggestedImageDownloadTask: suggestedImageDownloadTasks){
+                suggestedImageDownloadTask.cancel(true);
+            }
+
             mAdapter.clear();
         }
         if (timer != null) {
             timer.cancel();
         }
-        timer = new CountDownTimer(1000, 1000) {
+        timer = new CountDownTimer(2000, 2000) {
             @Override
             public void onTick(long millisUntilFinished) {
             }
@@ -253,38 +264,76 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
             @Override
             public void onFinish() {
                 if (text.length() > 0) {
-                    new ImagesSearchTask(text, ChatActivity.this).execute();
+                    imagesSearchTask = new ImagesSearchTask(text, ChatActivity.this);
+                    imagesSearchTask.execute();
                 }
             }
         }.start();
     }
 
-    public static void sendMessage(MessageItem messageItem) {
-        new SendMessageTask(mContext, messageItem).execute();
-    }
-
     @Override
-    public void onImageLabeled(ArrayList<LabeledImage> labeledImages) {
-        sendMessage(new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), getContactNumber(), MessageItem.TEXT_TYPE, labeledImages.get(0).getLabels()));
-    }
-
-    @Override
-    public void onImageSearchCompleted(List<Result> searchResults) {
-        for (int i = 0; i < searchResults.size() && i < 6; i++) {
-            new SuggestedImageDownload(this, searchResults.get(i).getLink()).execute();
+    public void onImageSearchCompleted(List<Result> searchResults, String text) {
+        SuggestedImage suggestedImage;
+        String[] aux = text.split(" ");
+        HashMap<String, Integer> keyWords = new HashMap<>();
+        for(String keyWord: aux){
+            keyWords.put(keyWord, 1);
+        }
+        for (int i = 0; i < searchResults.size(); i++) {
+            suggestedImage = new SuggestedImage(searchResults.get(i), keyWords);
+            SuggestedImageDownloadTask mTask = new SuggestedImageDownloadTask(this, suggestedImage);
+            suggestedImageDownloadTasks.add(mTask);
+            mTask.execute();
         }
     }
 
     @Override
-    public void onSuggestedImageDownloadFinish(Bitmap bitmap) {
+    public void onSuggestedImageDownloadFinish(SuggestedImage suggestedImage) {
         if (mAdapter == null) {
-            ArrayList<Bitmap> arrayList = new ArrayList<>();
-            arrayList.add(bitmap);
-            mAdapter = new SuggestedImageAdapter(arrayList);
+            ArrayList<SuggestedImage> suggestedImages = new ArrayList<>();
+            suggestedImages.add(suggestedImage);
+            mAdapter = new SuggestedImageAdapter(this, suggestedImages);
             recyclerView.setAdapter(mAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         } else {
-            mAdapter.add(bitmap);
+            mAdapter.add(suggestedImage);
+        }
+    }
+
+
+
+    public void onSuggestedImageSelected(SuggestedImage suggestedImage){
+        mAdapter.clear();
+        recyclerView.setVisibility(View.GONE);
+
+        if(suggestedImage.getBlobUrl() == null){
+            new ImageLabelDetectionTask(this, suggestedImage).execute();
+        } else {
+            sendImage(suggestedImage);
+        }
+    }
+
+    @Override
+    public void onImageLabeled(SuggestedImage suggestedImage) {
+        sendImage(suggestedImage);
+    }
+
+
+    public static void sendMessage(MessageItem messageItem) {
+        new SendMessageTask(mContext, messageItem).execute();
+    }
+
+    public void sendImage(SuggestedImage suggestedImage){
+        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), suggestedImage.getBitmap(), "fgagagasdgdsg", null);
+        Uri uri = Uri.parse(path);
+        String imgPath = Utils.getRealPathFromURI(mContext, uri);
+
+        MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, suggestedImage.getBlobUrl(), imgPath);
+
+        if(suggestedImage.getBlobUrl() == null){
+            new UploadImageTask(mContext, suggestedImage, messageItem).execute();
+        } else{
+            new UpdateImageTask(mContext, suggestedImage, messageItem).execute();
         }
     }
 }

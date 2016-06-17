@@ -1,16 +1,19 @@
 package com.university.gualdras.tfgapp.domain.network;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.university.gualdras.tfgapp.Constants;
+import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.MessageItem;
-import com.university.gualdras.tfgapp.presentation.chat.ChatActivity;
+import com.university.gualdras.tfgapp.domain.SuggestedImage;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,28 +31,30 @@ import okhttp3.Response;
 /**
  * Created by gualdras on 9/03/16.
  */
-public class ImageUploadTask extends AsyncTask<Void, Void, String> {
+public class UploadImageTask extends AsyncTask<Void, Void, String> {
 
     private static final String ITEMS_TAG = "items";
     private static final String TAG = "ImageUpload";
 
-    String path;
-    Activity mContext;
+    Context mContext;
     MessageItem messageItem;
+    SuggestedImage suggestedImage;
 
-    SharedPreferences sharedPreferences;
-
-    public ImageUploadTask(Activity context, String path, MessageItem messageItem){
-        this.path = path;
+    public UploadImageTask(Context context, SuggestedImage suggestedImage, MessageItem messageItem){
+        this.suggestedImage = suggestedImage;
         this.mContext = context;
         this.messageItem = messageItem;
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     @Override
     protected String doInBackground(Void... params) {
-        String blobURL = getBlobURL();
-        String imgURL = uploadImage(blobURL);
+        String imgURL = suggestedImage.getBlobUrl();
+        if(imgURL == null){
+            String blobURL = getBlobURL();
+            imgURL = uploadImage(blobURL);
+            suggestedImage.setBlobUrl(imgURL);
+            putImageInformation();
+        }
 
         return imgURL;
     }
@@ -93,7 +98,7 @@ public class ImageUploadTask extends AsyncTask<Void, Void, String> {
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "image.png", RequestBody.create(MediaType.parse("image/png"), new File(path)))
+                .addFormDataPart("file", "image.png", RequestBody.create(MediaType.parse("image/png"), new File(messageItem.getLocalResource())))
                 .addFormDataPart("title", "My photo")
                 .build();
 
@@ -111,10 +116,57 @@ public class ImageUploadTask extends AsyncTask<Void, Void, String> {
         return imgURL;
     }
 
+    private void putImageInformation(){
+        HttpURLConnection httpUrlConnection = null;
+
+        try {
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.CREATE_IMG_URL + "/" + suggestedImage.getBlobUrl())
+                    .openConnection();
+
+            httpUrlConnection.setRequestMethod("PUT");
+            httpUrlConnection.setRequestProperty("Content-Type", "application/json");
+
+            DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream ());
+
+            JSONObject jsonParam = new JSONObject();
+            jsonParam.put(ServerSharedConstants.LINK, suggestedImage.getLink());
+            jsonParam.put(ServerSharedConstants.SITE_LINK, suggestedImage.getSiteLink());
+            jsonParam.put(ServerSharedConstants.TAG, new JSONObject(suggestedImage.getTags()));
+            jsonParam.put(ServerSharedConstants.KEY_WORDS, new JSONObject(suggestedImage.getKeyWords()));
+            jsonParam.put(ServerSharedConstants.PHONE_NUMBER, messageItem.getFrom());
+
+            wr.writeBytes(jsonParam.toString());
+
+            wr.flush();
+            wr.close();
+
+            switch (httpUrlConnection.getResponseCode()){
+                case HttpURLConnection.HTTP_OK:
+                    InputStream in = new BufferedInputStream(
+                            httpUrlConnection.getInputStream());
+
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
+                    break;
+            }
+
+        } catch (MalformedURLException exception) {
+            Log.e(TAG, "MalformedURLException");
+        } catch (IOException exception) {
+            Log.e(TAG, "IOException");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != httpUrlConnection)
+                httpUrlConnection.disconnect();
+        }
+    }
+
     @Override
     protected void onPostExecute(String imgURL) {
         messageItem.setMsg(imgURL);
-        ChatActivity.sendMessage(messageItem);
+        new SendMessageTask(mContext, messageItem).execute();
     }
 }
 

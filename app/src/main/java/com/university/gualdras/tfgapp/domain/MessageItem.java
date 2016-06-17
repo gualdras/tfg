@@ -2,7 +2,6 @@ package com.university.gualdras.tfgapp.domain;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.provider.ContactsContract;
 
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
@@ -94,7 +93,7 @@ public class MessageItem {
         return jsonParam;
     }
 
-    public void saveMessageSended(Context mContext){
+    public void saveMessageSent(Context mContext){
         ContentValues values = new ContentValues(2);
         values.put(DataProvider.COL_TO, to);
         if(localResource == null){

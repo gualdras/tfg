@@ -24,6 +24,7 @@ public interface Constants {
     public static final String SERVER_URL = "http://tfg-server.appspot.com";
     String USERS_URL = SERVER_URL + "/users";
     String SEND = "/send";
+    String CREATE_IMG_URL = SERVER_URL + "/images";
     String UPLOAD_FORM_URL = SERVER_URL + "/upload_form";
     String DOWNLOAD_IMG_URL = SERVER_URL + "/img/";
 }

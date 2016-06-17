@@ -40,7 +40,7 @@ public class SendMessageTask extends AsyncTask<Void, Void, Void> {
                 httpURLConnection.disconnect();
         }
 
-        messageItem.saveMessageSended(mContext);
+        messageItem.saveMessageSent(mContext);
         return null;
     }
 }

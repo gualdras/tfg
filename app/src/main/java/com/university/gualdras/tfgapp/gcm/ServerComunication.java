@@ -2,8 +2,10 @@ package com.university.gualdras.tfgapp.gcm;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
@@ -28,6 +30,16 @@ public class ServerComunication {
         wr.flush();
         wr.close();
 
+        switch (httpURLConnection.getResponseCode()){
+            case HttpURLConnection.HTTP_OK:
+                InputStream in = new BufferedInputStream(
+                        httpURLConnection.getInputStream());
+
+                break;
+            case HttpURLConnection.HTTP_NOT_FOUND:
+                InputStream err = new BufferedInputStream(httpURLConnection.getErrorStream());
+                break;
+        }
         return httpURLConnection;
     }
 

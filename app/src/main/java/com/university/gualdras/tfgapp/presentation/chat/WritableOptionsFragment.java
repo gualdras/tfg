@@ -40,7 +40,7 @@ public class WritableOptionsFragment extends Fragment {
                 ((ChatActivity)getActivity()).onWriteMsgSelection();
             }
         });
-        selectImageBtn = (ImageButton) getActivity().findViewById(R.id.select_image_btn);
+/*        selectImageBtn = (ImageButton) getActivity().findViewById(R.id.select_image_btn);
         selectImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +53,6 @@ public class WritableOptionsFragment extends Fragment {
             public void onClick(View v) {
                 ((ChatActivity)getActivity()).onSpeechRecognitionSelection();
             }
-        });
+        });*/
     }
 }

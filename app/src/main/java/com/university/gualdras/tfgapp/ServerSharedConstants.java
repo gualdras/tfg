@@ -11,4 +11,11 @@ public interface ServerSharedConstants {
     String TOKEN = "regID";
     String CONTACTS = "contacts";
     String ID = "id";
+
+    String TAG = "tag";
+    String KEY_WORDS = "key_words";
+    String LINK = "link";
+    String SITE_LINK = "site_link";
+    String FLICKR_TAGS = "flickr_tags";
+
 }

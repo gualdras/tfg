@@ -18,32 +18,32 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import com.university.gualdras.tfgapp.domain.LabeledImage;
+import com.university.gualdras.tfgapp.domain.SuggestedImage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by gualdras on 22/04/16.
  */
-public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<LabeledImage>> {
+public class ImageLabelDetectionTask extends AsyncTask<Void, Void, SuggestedImage> {
     private static final String TAG = "ImageFilter";
     private static final String CLOUD_VISION_API_KEY = "AIzaSyCnc9PEMEajUk4E0zfT9CbMC1muNlMtwss";
 
-    ArrayList<Bitmap> bitmaps;
+    SuggestedImage suggestedImage;
     ImageInteractionListener mListener;
 
-    public ImageLabelDetectionTask(ArrayList<Bitmap> bitmaps, Activity activity) {
-        this.bitmaps = bitmaps;
+    public ImageLabelDetectionTask(Activity activity, SuggestedImage suggestedImage) {
+        this.suggestedImage = suggestedImage;
         this.mListener = (ImageInteractionListener) activity;
     }
 
 
-
     @Override
-    protected ArrayList<LabeledImage> doInBackground(Void... params) {
+    protected SuggestedImage doInBackground(Void... params) {
         try {
             HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
@@ -57,30 +57,30 @@ public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<La
                     new BatchAnnotateImagesRequest();
 
             ArrayList<AnnotateImageRequest> requests = new ArrayList<>();
-            for(Bitmap bitmap: bitmaps){
-                AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
+            Bitmap bitmap = suggestedImage.getBitmap();
+            AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
 
-                // Add the image
-                Image base64EncodedImage = new Image();
-                // Convert the bitmap to a JPEG
-                // Just in case it's a format that Android understands but Cloud Vision
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-                byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            // Add the image
+            Image base64EncodedImage = new Image();
+            // Convert the bitmap to a JPEG
+            // Just in case it's a format that Android understands but Cloud Vision
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
-                // Base64 encode the JPEG
-                base64EncodedImage.encodeContent(imageBytes);
-                annotateImageRequest.setImage(base64EncodedImage);
+            // Base64 encode the JPEG
+            base64EncodedImage.encodeContent(imageBytes);
+            annotateImageRequest.setImage(base64EncodedImage);
 
-                // add the features we want
-                annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                    Feature labelDetection = new Feature();
-                    labelDetection.setType("LABEL_DETECTION");
-                    labelDetection.setMaxResults(10);
-                    add(labelDetection);
-                }});
-                requests.add(annotateImageRequest);
-            }
+            // add the features we want
+            annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
+                Feature labelDetection = new Feature();
+                labelDetection.setType("LABEL_DETECTION");
+                labelDetection.setMaxResults(10);
+                add(labelDetection);
+            }});
+            requests.add(annotateImageRequest);
+
 
             batchAnnotateImagesRequest.setRequests(requests);
 
@@ -91,7 +91,7 @@ public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<La
             Log.d(TAG, "created Cloud Vision request object, sending request");
 
             BatchAnnotateImagesResponse response = annotateRequest.execute();
-            return convertResponseToString(response);
+            suggestedImage.setTags(convertResponseToMap(response));
 
         } catch (GoogleJsonResponseException e) {
             Log.d(TAG, "failed to make API request because " + e.getContent());
@@ -99,31 +99,26 @@ public class ImageLabelDetectionTask extends AsyncTask <Void, Void, ArrayList<La
             Log.d(TAG, "failed to make API request because of other IOException " +
                     e.getMessage());
         }
-        return null;
+        return suggestedImage;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<LabeledImage> imagesLabeled) {
-        mListener.onImageLabeled(imagesLabeled);
+    protected void onPostExecute(SuggestedImage suggestedImage) {
+        mListener.onImageLabeled(suggestedImage);
     }
 
-    private ArrayList<LabeledImage> convertResponseToString(BatchAnnotateImagesResponse responses) {
-        ArrayList<LabeledImage> labeledImages = new ArrayList<>();
-        String message;
-        for(int i=0; i<responses.getResponses().size(); i++){
+    private HashMap<String, Float> convertResponseToMap(BatchAnnotateImagesResponse responses) {
+        HashMap<String, Float> tags = new HashMap<>();
+
+        for (int i = 0; i < responses.getResponses().size(); i++) {
             List<EntityAnnotation> labels = responses.getResponses().get(i).getLabelAnnotations();
             if (labels != null) {
-                message = "";
                 for (EntityAnnotation label : labels) {
-                    message += String.format("%.3f: %s", label.getScore(), label.getDescription());
-                    message += ", ";
+                    tags.put(label.getDescription(), label.getScore());
                 }
-            } else {
-                message = "nothing";
             }
-            labeledImages.add(new LabeledImage(bitmaps.get(i), message));
         }
 
-        return labeledImages;
+        return tags;
     }
 }

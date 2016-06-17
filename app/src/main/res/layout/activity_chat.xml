@@ -39,9 +39,7 @@
             android:name="com.university.gualdras.tfgapp.presentation.chat.MessagesFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:stackFromBottom="true"
-            android:transcriptMode="alwaysScroll" />
+            android:layout_weight="1"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_gallery"

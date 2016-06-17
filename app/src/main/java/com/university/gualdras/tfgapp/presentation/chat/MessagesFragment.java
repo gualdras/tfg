@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -50,7 +51,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
                                 root.setGravity(Gravity.LEFT);
                                 root.setPadding(10, 10, 50, 10);
                             }
-                        } else{
+                        } else {
                             TextView tv = (TextView) view;
                             tv.setText("");
                             return true;
@@ -82,6 +83,8 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        getListView().setStackFromBottom(true);
+        getListView().setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
         getListView().setDivider(null);
 
         Bundle args = new Bundle();

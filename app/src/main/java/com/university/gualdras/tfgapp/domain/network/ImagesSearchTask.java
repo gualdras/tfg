@@ -65,7 +65,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, List<Result>> {
     @Override
     protected void onPostExecute(List<Result> searchResults) {
         if(searchResults != null){
-            mListener.onImageSearchCompleted(searchResults);
+            mListener.onImageSearchCompleted(searchResults, keyWords);
         }
     }
 }
