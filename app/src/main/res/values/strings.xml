@@ -15,6 +15,7 @@
     <string name="progress_install_title">Installation progress</string>
     <string name="progress_install_gcm">Registering your device...</string>
     <string name="progress_checking_contacts">Updating your contacts...</string>
+    <string name="progress_copying_dictionary">Configuring files</string>
 
 
     <string-array name="CountryCodes" >

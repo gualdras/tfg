@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import com.google.api.services.customsearch.model.Result;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,11 +14,11 @@ public class SuggestedImage {
     String blobUrl;
     String link;
     String siteLink;
-    String [] flickrTags;
+    String[] flickrTags;
     Bitmap bitmap;
     String path;
     HashMap<String, Float> tags;
-    HashMap<String, Integer> keyWords;
+    ArrayList<String> keyWords;
 
 
     public SuggestedImage(String link, String siteLink, Bitmap bitmap, String path) {
@@ -35,10 +36,16 @@ public class SuggestedImage {
         this.path = path;
     }
 
-    public SuggestedImage(Result searchResults, HashMap<String, Integer> keyWords) {
-            link = searchResults.getLink();
-            siteLink = searchResults.getDisplayLink();
+    public SuggestedImage(Result searchResults, ArrayList<String> keyWords) {
+        link = searchResults.getLink();
+        siteLink = searchResults.getDisplayLink();
         this.keyWords = keyWords;
+    }
+
+    public SuggestedImage(ArrayList<String> keyWords, String blobUrl, String link) {
+        this.keyWords = keyWords;
+        this.blobUrl = blobUrl;
+        this.link = link;
     }
 
     public String getBlobUrl() {
@@ -97,11 +104,20 @@ public class SuggestedImage {
         this.tags = tags;
     }
 
-    public HashMap<String, Integer> getKeyWords() {
+    public ArrayList<String> getKeyWords() {
         return keyWords;
     }
 
-    public void setKeyWords(HashMap<String, Integer> keyWords) {
+    public void setKeyWords(ArrayList<String> keyWords) {
         this.keyWords = keyWords;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        SuggestedImage suggestedImage = (SuggestedImage)o;
+        if(this.blobUrl.equals(suggestedImage.blobUrl) || this.link.equalsIgnoreCase(suggestedImage.link)){
+            return true;
+        }
+        return false;
     }
 }

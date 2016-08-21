@@ -1,6 +1,5 @@
 package com.university.gualdras.tfgapp.presentation;
 
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
+import com.university.gualdras.tfgapp.domain.CopyDictionary;
 import com.university.gualdras.tfgapp.gcm.Preferences;
 import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 
@@ -44,7 +44,7 @@ public class InstallActivity extends AppCompatActivity{
     Button okBtn;
     SharedPreferences sharedPreferences;
 
-    ProgressDialog progressDialog;
+    //ProgressDialog progressDialog;
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
@@ -85,7 +85,11 @@ public class InstallActivity extends AppCompatActivity{
 
                 setResult(RESULT_OK);
                 registrationIntent();
-                progressDialog = ProgressDialog.show(InstallActivity.this, getResources().getString(R.string.progress_install_title), getResources().getString(R.string.progress_install_gcm));
+//                progressDialog = ProgressDialog.show(InstallActivity.this, getResources().getString(R.string.progress_install_title), getResources().getString(R.string.progress_install_gcm));
+
+                new CopyDictionary(getAssets(), InstallActivity.this).execute();
+
+
                 finish();
             }
         });
@@ -126,10 +130,10 @@ public class InstallActivity extends AppCompatActivity{
                 boolean sentToken = sharedPreferences
                         .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    progressDialog.dismiss();
+                    //progressDialog.dismiss();
                     finish();
                 } else {
-                    progressDialog.dismiss();
+                    //progressDialog.dismiss();
                     Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
                 }
             }

@@ -39,7 +39,7 @@ public class ReceivedImageDownloadTask extends AsyncTask<Void, Void, String> {
         String imgPath;
 
         try {
-            httpUrlConnection = (HttpURLConnection) new URL(Constants.DOWNLOAD_IMG_URL + messageItem.getMsg())
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.IMAGES_URL + "/" + messageItem.getMsg())
                     .openConnection();
 
             switch (httpUrlConnection.getResponseCode()){

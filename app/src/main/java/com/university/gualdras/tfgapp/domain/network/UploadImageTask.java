@@ -9,6 +9,7 @@ import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.domain.SuggestedImage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,6 +52,7 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
         String imgURL = suggestedImage.getBlobUrl();
         if(imgURL == null){
             String blobURL = getBlobURL();
+
             imgURL = uploadImage(blobURL);
             suggestedImage.setBlobUrl(imgURL);
             putImageInformation();
@@ -120,7 +122,7 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
         HttpURLConnection httpUrlConnection = null;
 
         try {
-            httpUrlConnection = (HttpURLConnection) new URL(Constants.CREATE_IMG_URL + "/" + suggestedImage.getBlobUrl())
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.IMAGES_URL + "/" + suggestedImage.getBlobUrl())
                     .openConnection();
 
             httpUrlConnection.setRequestMethod("PUT");
@@ -132,7 +134,7 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
             jsonParam.put(ServerSharedConstants.LINK, suggestedImage.getLink());
             jsonParam.put(ServerSharedConstants.SITE_LINK, suggestedImage.getSiteLink());
             jsonParam.put(ServerSharedConstants.TAG, new JSONObject(suggestedImage.getTags()));
-            jsonParam.put(ServerSharedConstants.KEY_WORDS, new JSONObject(suggestedImage.getKeyWords()));
+            jsonParam.put(ServerSharedConstants.KEY_WORDS, new JSONArray(suggestedImage.getKeyWords()));
             jsonParam.put(ServerSharedConstants.PHONE_NUMBER, messageItem.getFrom());
 
             wr.writeBytes(jsonParam.toString());

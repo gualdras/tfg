@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class ImageLabelDetectionTask extends AsyncTask<Void, Void, SuggestedImage> {
     private static final String TAG = "ImageFilter";
-    private static final String CLOUD_VISION_API_KEY = "AIzaSyCnc9PEMEajUk4E0zfT9CbMC1muNlMtwss";
+    private static final String CLOUD_VISION_API_KEY = "AIzaSyCHiOSu8pudqXgYKpzJRNnIBQLhHlFb07g";
 
     SuggestedImage suggestedImage;
     ImageInteractionListener mListener;

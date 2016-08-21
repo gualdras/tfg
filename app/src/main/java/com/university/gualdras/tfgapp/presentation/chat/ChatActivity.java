@@ -24,8 +24,10 @@ import com.google.api.services.customsearch.model.Result;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.Utils;
+import com.university.gualdras.tfgapp.domain.InputProcess;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.domain.SuggestedImage;
+import com.university.gualdras.tfgapp.domain.network.CheckImageDatastoreTask;
 import com.university.gualdras.tfgapp.domain.network.ImageInteractionListener;
 import com.university.gualdras.tfgapp.domain.network.ImageLabelDetectionTask;
 import com.university.gualdras.tfgapp.domain.network.ImagesSearchTask;
@@ -37,7 +39,6 @@ import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -264,21 +265,22 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
             @Override
             public void onFinish() {
                 if (text.length() > 0) {
-                    imagesSearchTask = new ImagesSearchTask(text, ChatActivity.this);
+                    String search = InputProcess.cleanInput(text);
+                    ArrayList<String> keyWords = InputProcess.expandInput(search);
+                    imagesSearchTask = new ImagesSearchTask(search, keyWords, ChatActivity.this);
                     imagesSearchTask.execute();
                 }
             }
         }.start();
     }
 
+    //--------------------------------------------------------------------------------------------------------------//
+    //Return suggestedImages instead of Results
     @Override
-    public void onImageSearchCompleted(List<Result> searchResults, String text) {
+    public void onImageSearchCompleted(List<Result> searchResults, String search) {
         SuggestedImage suggestedImage;
-        String[] aux = text.split(" ");
-        HashMap<String, Integer> keyWords = new HashMap<>();
-        for(String keyWord: aux){
-            keyWords.put(keyWord, 1);
-        }
+        ArrayList<String> keyWords = InputProcess.expandInput(search);
+
         for (int i = 0; i < searchResults.size(); i++) {
             suggestedImage = new SuggestedImage(searchResults.get(i), keyWords);
             SuggestedImageDownloadTask mTask = new SuggestedImageDownloadTask(this, suggestedImage);
@@ -286,6 +288,8 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
             mTask.execute();
         }
     }
+
+    //--------------------------------------------------------------------------------------------------------------//
 
     @Override
     public void onSuggestedImageDownloadFinish(SuggestedImage suggestedImage) {
@@ -302,14 +306,24 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
 
 
 
+
     public void onSuggestedImageSelected(SuggestedImage suggestedImage){
         mAdapter.clear();
         recyclerView.setVisibility(View.GONE);
-
-        if(suggestedImage.getBlobUrl() == null){
-            new ImageLabelDetectionTask(this, suggestedImage).execute();
-        } else {
+        if(suggestedImage.getBlobUrl() != null ){
             sendImage(suggestedImage);
+        } else {
+            //TODO: Add case in which image found on internet is already in datastore
+            new CheckImageDatastoreTask(this, suggestedImage).execute();
+        }
+    }
+
+    @Override
+    public void onImageCheckedInDatastore(SuggestedImage suggestedImage) {
+        if(suggestedImage.getBlobUrl() != null ){
+            sendImage(suggestedImage);
+        }else {
+            new ImageLabelDetectionTask(this, suggestedImage).execute();
         }
     }
 
@@ -324,7 +338,7 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     }
 
     public void sendImage(SuggestedImage suggestedImage){
-        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), suggestedImage.getBitmap(), "fgagagasdgdsg", null);
+        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), suggestedImage.getBitmap(), "image", null);
         Uri uri = Uri.parse(path);
         String imgPath = Utils.getRealPathFromURI(mContext, uri);
 

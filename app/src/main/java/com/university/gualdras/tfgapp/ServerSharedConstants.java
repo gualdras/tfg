@@ -11,7 +11,9 @@ public interface ServerSharedConstants {
     String TOKEN = "regID";
     String CONTACTS = "contacts";
     String ID = "id";
+    String USER_ID = PHONE_NUMBER;
 
+    String BLOB = "blob";
     String TAG = "tag";
     String KEY_WORDS = "key_words";
     String LINK = "link";

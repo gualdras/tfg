@@ -42,7 +42,7 @@ public class UpdateImageTask extends AsyncTask<Void, Void, Void> {
         HttpURLConnection httpUrlConnection = null;
 
         try {
-            httpUrlConnection = (HttpURLConnection) new URL(Constants.CREATE_IMG_URL + "/" + suggestedImage.getBlobUrl())
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.IMAGES_URL + "/" + suggestedImage.getBlobUrl())
                     .openConnection();
 
             httpUrlConnection.setRequestMethod("PUT");
@@ -52,7 +52,7 @@ public class UpdateImageTask extends AsyncTask<Void, Void, Void> {
             DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream ());
 
             JSONObject jsonParam = new JSONObject();
-            jsonParam.put(ServerSharedConstants.KEY_WORDS, new JSONObject(suggestedImage.getKeyWords()));
+            jsonParam.put(ServerSharedConstants.KEY_WORDS, suggestedImage.getKeyWords());
             jsonParam.put(ServerSharedConstants.PHONE_NUMBER, messageItem.getFrom());
 
 
