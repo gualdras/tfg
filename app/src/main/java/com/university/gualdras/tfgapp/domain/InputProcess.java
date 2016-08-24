@@ -24,30 +24,30 @@ public class InputProcess {
 
     static IDictionary dict;
 
-
     public static String cleanInput(String input){
-        String[] sInput = input.split(" ");
         StringBuilder output = new StringBuilder();
-        URL url = null;
-        try {
-            url = new URL("file", null, Constants.PATH_TO_DICT);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        dict = new Dictionary(url) ;
+        if(input.length() > 0) {
+            String[] sInput = input.split(" ");
+            output = new StringBuilder();
+            URL url = null;
+            try {
+                url = new URL("file", null, Constants.PATH_TO_DICT);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            dict = new Dictionary(url);
+            try {
+                dict.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (String w : sInput) {
+                List<String> s;
 
-        try {
-            dict.open();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for(String w: sInput){
-            List<String> s;
-
-            WordnetStemmer ws = new WordnetStemmer(dict);
-            if((s = ws.findStems(w, null)).size() > 0){
-                output.append(s.get(0) + " ");
+                WordnetStemmer ws = new WordnetStemmer(dict);
+                if ((s = ws.findStems(w, null)).size() > 0) {
+                    output.append(s.get(0) + " ");
+                }
             }
         }
         return output.toString().trim();
@@ -57,7 +57,6 @@ public class InputProcess {
         String[] input = search.split(" ");
         ArrayList<String> synList = new ArrayList<>();
 
-
         URL url = null;
         try {
             url = new URL("file", null, Constants.PATH_TO_DICT);
@@ -71,7 +70,6 @@ public class InputProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         for (String w : input) {
             for (POS pos : POS.values()) {

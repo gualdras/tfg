@@ -16,6 +16,11 @@ import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.SuggestedImage;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,6 +70,9 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
             mListener.onImageSearchCompleted(searchResults, keyWords);
         }
         */
+        if(suggestedImages != null){
+            mListener.onImageSearchCompleted(suggestedImages, keyWords);
+        }
     }
 
     public void getRecommendation(){
@@ -90,7 +98,9 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
 
                     String response = readStream(in);
 
-
+                    getImagesCollaborative(response);
+                    getImagesContentBased(response);
+                    getImagesRemaining();
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
@@ -101,24 +111,53 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
             Log.e(TAG, "MalformedURLException");
         } catch (IOException exception) {
             Log.e(TAG, "IOException");
+        } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             if (null != httpUrlConnection)
                 httpUrlConnection.disconnect();
         }
     }
 
-    public void getImagesColaborative(ArrayList<String> blobs, ArrayList<String> links){
-        for(int i = 0; i < blobs.size(); i++){
-            suggestedImages.add(new SuggestedImage(keyWords, blobs.get(i), links.get(i)));
+/*    private ArrayList<String> JSONProcess (String response, String tag){
+        ArrayList<String> result = new ArrayList<>();
+        try {
+            JSONObject responseObject = (JSONObject) new JSONTokener(
+                    response).nextValue();
+
+            JSONArray items = responseObject
+                    .getJSONArray(tag);
+
+            for(int i=0; i<items.length(); i++){
+                result.add(items.getString(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }*/
+
+
+    public void getImagesCollaborative(String response) throws JSONException {
+        JSONArray items = JSONProcess(response, ServerSharedConstants.BLOB);
+        for(int i=0; i<items.length(); i++){
+            JSONObject item = items.getJSONObject(i);
+            suggestedImages.add(new SuggestedImage(item.getString(ServerSharedConstants.LINK), item.getString(ServerSharedConstants.BLOB), keyWords));
         }
     }
 
-    public void getSites(String[] sites){
-        for(int i = 0; sites != null && i < sites.length; i++){
+    public void getImagesContentBased(String response) throws JSONException, IOException {
+        ArrayList<String> sites = new ArrayList<>();
+        JSONArray items = JSONProcess(response, ServerSharedConstants.SITE_LINK);
+        for(int i=0; i<items.length(); i++){
+            sites.add(items.getString(i));
+        }
+
+        for(int i = 0; i < sites.size(); i++){
             boolean searchingImage = true;
-            List<Result> searchResults = searchGSE(sites[i]);
-            for(int j = 0; searchingImage && j < searchResults.size(); j++){
-                SuggestedImage suggestedImage = new SuggestedImage(searchResults.get(i), keyWords);
+            List<Result> searchResults = searchGSE(sites.get(i));
+            for(int j = 0; searchingImage && searchResults != null && j < searchResults.size(); j++){
+                SuggestedImage suggestedImage = new SuggestedImage(searchResults.get(j), keyWords);
                 if(!suggestedImages.contains(suggestedImage)){
                     suggestedImages.add(suggestedImage);
                     searchingImage = false;
@@ -127,34 +166,46 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    public void getImagesRemaining(){
-        List<Result> results = searchGSE(null);
+    private JSONArray JSONProcess(String response, String tag) throws JSONException {
+        JSONArray items;
+            JSONObject responseObject = (JSONObject) new JSONTokener(
+                    response).nextValue();
+
+            items = responseObject
+                    .getJSONArray(tag);
+        return items;
     }
 
-    private List<Result> searchGSE(@Nullable String site){
+
+
+    public void getImagesRemaining() throws IOException {
+        List<Result> results = searchGSE(null);
+
+        if(results != null) {
+            while (suggestedImages.size() < ServerSharedConstants.NUMBER_OF_IMAGES) {
+                SuggestedImage suggestedImage = new SuggestedImage(results.remove(0), keyWords);
+                if (!suggestedImages.contains(suggestedImage)) suggestedImages.add(suggestedImage);
+            }
+        }
+    }
+
+    private List<Result> searchGSE(@Nullable String site) throws IOException {
         Customsearch customsearch = new Customsearch(new NetHttpTransport(), new JacksonFactory(), null);
         com.google.api.services.customsearch.Customsearch.Cse.List list;
         Search results;
-        List<Result> searchResults = null;
+        List<Result> searchResults;
 
-        try {
             list = customsearch.cse().list(search);
             list.setKey(key);
             list.setCx(cx);
             list.setSearchType("image");
             if(site != null){
-                list.setSiteSearch(search);
+                list.setSiteSearch(site);
             }
 
             results = list.execute();
             searchResults = results.getItems();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        for(Result result: searchResults){
-            new SuggestedImage(result, keyWords);
-        }
+
         return searchResults;
     }
 
@@ -163,7 +214,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
         StringBuffer data = new StringBuffer("");
         try {
             reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
+            String line;
             while ((line = reader.readLine()) != null) {
                 data.append(line);
             }

@@ -60,19 +60,15 @@ public class ImageLabelDetectionTask extends AsyncTask<Void, Void, SuggestedImag
             Bitmap bitmap = suggestedImage.getBitmap();
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
 
-            // Add the image
             Image base64EncodedImage = new Image();
-            // Convert the bitmap to a JPEG
-            // Just in case it's a format that Android understands but Cloud Vision
+
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
-            // Base64 encode the JPEG
             base64EncodedImage.encodeContent(imageBytes);
             annotateImageRequest.setImage(base64EncodedImage);
 
-            // add the features we want
             annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
                 Feature labelDetection = new Feature();
                 labelDetection.setType("LABEL_DETECTION");
@@ -86,7 +82,6 @@ public class ImageLabelDetectionTask extends AsyncTask<Void, Void, SuggestedImag
 
             Vision.Images.Annotate annotateRequest =
                     vision.images().annotate(batchAnnotateImagesRequest);
-            // Due to a bug: requests to Vision API containing large images fail when GZipped.
             annotateRequest.setDisableGZipContent(true);
             Log.d(TAG, "created Cloud Vision request object, sending request");
 

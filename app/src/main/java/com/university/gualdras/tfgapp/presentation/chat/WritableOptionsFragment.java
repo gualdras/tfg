@@ -47,12 +47,13 @@ public class WritableOptionsFragment extends Fragment {
                 ((ChatActivity)getActivity()).onImgSelection();
             }
         });
+        */
         speechRecognitionBtn = (ImageButton) getActivity().findViewById(R.id.speech_recognition_btn);
         speechRecognitionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((ChatActivity)getActivity()).onSpeechRecognitionSelection();
             }
-        });*/
+        });
     }
 }

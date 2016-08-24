@@ -9,6 +9,7 @@ import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.domain.SuggestedImage;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,7 +53,7 @@ public class UpdateImageTask extends AsyncTask<Void, Void, Void> {
             DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream ());
 
             JSONObject jsonParam = new JSONObject();
-            jsonParam.put(ServerSharedConstants.KEY_WORDS, suggestedImage.getKeyWords());
+            jsonParam.put(ServerSharedConstants.KEY_WORDS, new JSONArray(suggestedImage.getKeyWords()));
             jsonParam.put(ServerSharedConstants.PHONE_NUMBER, messageItem.getFrom());
 
 
@@ -84,5 +85,13 @@ public class UpdateImageTask extends AsyncTask<Void, Void, Void> {
         }
 
         return null;
+    }
+
+
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        messageItem.setMsg(suggestedImage.getBlobUrl());
+        new SendMessageTask(mContext, messageItem).execute();
     }
 }

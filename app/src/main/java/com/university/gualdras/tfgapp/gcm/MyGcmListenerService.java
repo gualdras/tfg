@@ -25,6 +25,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
     private static final int MY_NOTIFICATION_ID = 1;
+    private static final String IMAGE = "Image received";
     /**
      * Called when message is received.
      *
@@ -42,47 +43,24 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d(TAG, "SenderID: " + senderID);
         Log.d(TAG, "Message: " + msg);
 
-        /*if (from.startsWith("/topics/")) {
-            // message received from some topic.
-        } else {
-            // normal downstream message.
-        }*/
-
-        // [START_EXCLUDE]
-        /**
-         * Production applications would usually process the message here.
-         * Eg: -   with server.
-         *     - Store message in local database.
-         *     - Update UI.
-         */
         MessageItem messageItem = new MessageItem(from, type, msg);
 
         if(type.equals(MessageItem.IMG_TYPE)){
             new ReceivedImageDownloadTask(this, messageItem).execute();
+            msg = IMAGE;
         }
         else {
             messageItem.saveMessageReceived(this);
-
-            /**
-             * In some cases it may be useful to show a notification indicating to the user
-             * that a message was received.
-             */
-            sendNotification(msg);
-            // [END_EXCLUDE]
         }
+        sendNotification(msg);
     }
     // [END receive_message]
 
-    /**
-     * Create and show a simple notification containing the received GCM message.
-     *
-     * @param msg GCM message received.
-     */
     private void sendNotification(String msg) {
         //TODO
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

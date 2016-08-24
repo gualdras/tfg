@@ -40,6 +40,9 @@ public class WriteMessageFragment extends Fragment {
         return inflater.inflate(R.layout.write_message_fragment, container, false);
     }
 
+    public void changeText(String text){
+        mEditText.setText(text);
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

@@ -20,4 +20,5 @@ public interface ServerSharedConstants {
     String SITE_LINK = "site_link";
     String FLICKR_TAGS = "flickr_tags";
 
+    int NUMBER_OF_IMAGES = 10;
 }

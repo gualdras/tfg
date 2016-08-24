@@ -1,5 +1,10 @@
 package com.university.gualdras.tfgapp.domain;
 
+import android.content.ContentValues;
+import android.content.Context;
+
+import com.university.gualdras.tfgapp.persistence.DataProvider;
+
 /**
  * Created by gualdras on 20/09/15.
  */
@@ -47,5 +52,13 @@ public class ContactItem {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public void saveContact(Context mContext){
+        ContentValues values = new ContentValues(3);
+        values.put(DataProvider.COL_NAME, contactName);
+        values.put(DataProvider.COL_PHONE_NUMBER, phoneNumber);
+        values.put(DataProvider.COL_PHOTO, photoProfile);
+        mContext.getContentResolver().insert(DataProvider.CONTENT_URI_PROFILE, values);
     }
 }

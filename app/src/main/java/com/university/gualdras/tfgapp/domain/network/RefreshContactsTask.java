@@ -1,7 +1,6 @@
 package com.university.gualdras.tfgapp.domain.network;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -44,14 +43,54 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
     @Override
     protected String doInBackground(Context... params) {
         mContext = params[0];
-        String contactId, completeNumber;
         String data = "";
+
+        HttpURLConnection httpURLConnection = null;
+
+        JSONObject jsonParams = processPhoneNumbers();
+
+        try {
+            httpURLConnection = ServerComunication.post(Constants.USERS_URL, jsonParams, Constants.MAX_ATTEMPTS);
+            int code = httpURLConnection.getResponseCode();
+            if (code == HttpURLConnection.HTTP_OK) {
+                InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
+                data = NetworkUtils.readStream(in);
+                error = false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != httpURLConnection)
+                httpURLConnection.disconnect();
+        }
+        return data;
+    }
+
+    @Override
+    protected void onPostExecute(String response) {
+        if (!error) {
+            updateContacts(response);
+        }
+        ContactTab.OnRefreshContactsFinish();
+    }
+
+    private void updateContacts(String response) {
+        ArrayList<ContactItem> newContacts = JSONProcess(response);
+
+        for (ContactItem contact : newContacts) {
+            contact.saveContact(mContext);
+        }
+    }
+
+    private JSONObject processPhoneNumbers(){
+
+        String contactId, completeNumber;
 
         ArrayList<String> contactsAlreadyChecked = new ArrayList<>();
 
         JSONObject jsonParams = new JSONObject();
         JSONArray contactsJson = new JSONArray();
-        HttpURLConnection httpURLConnection = null;
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         Phonenumber.PhoneNumber numberProto = null;
@@ -103,7 +142,6 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             }
         }
 
-        //Todo: change this
         if (phones != null && !phones.isClosed()) {
             phones.close();
         }
@@ -117,45 +155,9 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             Log.d(TAG, e.toString());
         }
 
-        try {
-            httpURLConnection = ServerComunication.post(Constants.USERS_URL, jsonParams, Constants.MAX_ATTEMPTS);
-            int code = httpURLConnection.getResponseCode();
-            if (code == HttpURLConnection.HTTP_OK) {
-                InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
-                data = NetworkUtils.readStream(in);
-                error = false;
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (null != httpURLConnection)
-                httpURLConnection.disconnect();
-        }
-        return data;
+        return jsonParams;
     }
 
-    @Override
-    protected void onPostExecute(String response) {
-        if (!error) {
-            updateContacts(response);
-        }
-        ContactTab.OnRefreshContactsFinish();
-    }
-
-    private void updateContacts(String response) {
-        ArrayList<ContactItem> newContacts = JSONProcess(response);
-
-        for (ContactItem contact : newContacts) {
-            ContentValues values = new ContentValues(3);
-            values.put(DataProvider.COL_NAME, contact.getContactName());
-            values.put(DataProvider.COL_PHONE_NUMBER, contact.getPhoneNumber());
-            values.put(DataProvider.COL_PHOTO, contact.getPhotoProfile());
-            mContext.getContentResolver().insert(DataProvider.CONTENT_URI_PROFILE, values);
-        }
-    }
-
-    //Todo: remove id
     private ArrayList<ContactItem> JSONProcess(String response) {
         String contactName = "", phoneNumber, photo = "";
 

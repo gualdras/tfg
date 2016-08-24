@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,8 +20,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.api.services.customsearch.model.Result;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.Utils;
@@ -39,7 +40,7 @@ import com.university.gualdras.tfgapp.persistence.DataProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -184,46 +185,49 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         mFragmentManager.executePendingTransactions();
     }
 
-    /*public void onSpeechRecognitionSelection() {
+    public void onSpeechRecognitionSelection() {
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, R.string.speech_recognition_hint);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().getDisplayLanguage());
         startActivityForResult(speechIntent, SPEECH_CODE);
     }
-
+    /*
     public void onImgSelection(){
             Intent chooserIntent = new Intent(Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
             startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
     }
-
+    */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         MessageItem messageItem;
         if(requestCode == SPEECH_CODE){
             if(resultCode == RESULT_OK){
-                String msg = "";
+                String text;
                 ArrayList<String> words = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                for(String w: words){
-                    msg += w;
-                }
-                messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.TEXT_TYPE, msg);
+                text = words.get(0);
+                onWriteMsgSelection();
+                mWriteMessage.changeText(text);
+                //onTextChangedListener(msg);
+                /*messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.TEXT_TYPE, msg);
                 sendMessage(messageItem);
+                */
             } else{
-                Toast.makeText(this, "Not understood", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.not_understood, Toast.LENGTH_SHORT).show();
             }
         }
+        /*
         else {
             if(requestCode == PICK_IMAGE_CODE && resultCode == RESULT_OK){
                 ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
                 Uri uri = data.getData();
                 String path = Utils.getRealPathFromURI(this, uri);
 
-                *//*This send the image
+                //*This send the image
                 messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.IMG_TYPE, "", path);
-                new ImageUploadTask(this, path, messageItem).execute();*//*
+                new ImageUploadTask(this, path, messageItem).execute();
 
                 //This is for labeling an image
                 Bitmap bitmap = BitmapFactory.decodeFile(path);
@@ -231,7 +235,8 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
                 new ImageLabelDetectionTask(bitmaps, this).execute();
             }
         }
-    }*/
+        */
+    }
 
     public String getContactNumber() {
         return contactPhoneNumber;
@@ -266,9 +271,11 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
             public void onFinish() {
                 if (text.length() > 0) {
                     String search = InputProcess.cleanInput(text);
-                    ArrayList<String> keyWords = InputProcess.expandInput(search);
-                    imagesSearchTask = new ImagesSearchTask(search, keyWords, ChatActivity.this);
-                    imagesSearchTask.execute();
+                    if (search.length() > 0) {
+                        ArrayList<String> keyWords = InputProcess.expandInput(search);
+                        imagesSearchTask = new ImagesSearchTask(search, keyWords, ChatActivity.this);
+                        imagesSearchTask.execute();
+                    }
                 }
             }
         }.start();
@@ -277,12 +284,11 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     //--------------------------------------------------------------------------------------------------------------//
     //Return suggestedImages instead of Results
     @Override
-    public void onImageSearchCompleted(List<Result> searchResults, String search) {
+    public void onImageSearchCompleted(ArrayList<SuggestedImage> suggestedImages, ArrayList<String> keyWords) {
         SuggestedImage suggestedImage;
-        ArrayList<String> keyWords = InputProcess.expandInput(search);
 
-        for (int i = 0; i < searchResults.size(); i++) {
-            suggestedImage = new SuggestedImage(searchResults.get(i), keyWords);
+        for (int i = 0; i < suggestedImages.size(); i++) {
+            suggestedImage = suggestedImages.get(i);
             SuggestedImageDownloadTask mTask = new SuggestedImageDownloadTask(this, suggestedImage);
             suggestedImageDownloadTasks.add(mTask);
             mTask.execute();
@@ -305,15 +311,12 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     }
 
 
-
-
     public void onSuggestedImageSelected(SuggestedImage suggestedImage){
         mAdapter.clear();
         recyclerView.setVisibility(View.GONE);
         if(suggestedImage.getBlobUrl() != null ){
             sendImage(suggestedImage);
         } else {
-            //TODO: Add case in which image found on internet is already in datastore
             new CheckImageDatastoreTask(this, suggestedImage).execute();
         }
     }

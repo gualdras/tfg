@@ -42,7 +42,7 @@ public class SuggestedImage {
         this.keyWords = keyWords;
     }
 
-    public SuggestedImage(ArrayList<String> keyWords, String blobUrl, String link) {
+    public SuggestedImage(String link, String blobUrl, ArrayList<String> keyWords) {
         this.keyWords = keyWords;
         this.blobUrl = blobUrl;
         this.link = link;
@@ -115,7 +115,7 @@ public class SuggestedImage {
     @Override
     public boolean equals(Object o) {
         SuggestedImage suggestedImage = (SuggestedImage)o;
-        if(this.blobUrl.equals(suggestedImage.blobUrl) || this.link.equalsIgnoreCase(suggestedImage.link)){
+        if((this.link != null && this.link.equalsIgnoreCase(suggestedImage.link)) || (this.blobUrl != null && this.blobUrl.equals(suggestedImage.blobUrl))){
             return true;
         }
         return false;
