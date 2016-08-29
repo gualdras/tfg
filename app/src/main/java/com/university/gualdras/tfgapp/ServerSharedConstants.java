@@ -13,6 +13,7 @@ public interface ServerSharedConstants {
     String ID = "id";
     String USER_ID = PHONE_NUMBER;
 
+    String IMAGE = "image";
     String BLOB = "blob";
     String TAG = "tag";
     String KEY_WORDS = "key_words";

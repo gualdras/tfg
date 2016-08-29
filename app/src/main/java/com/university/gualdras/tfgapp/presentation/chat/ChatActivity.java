@@ -272,7 +272,7 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
                 if (text.length() > 0) {
                     String search = InputProcess.cleanInput(text);
                     if (search.length() > 0) {
-                        ArrayList<String> keyWords = InputProcess.expandInput(search);
+                        ArrayList<String> keyWords = InputProcess.getSynonyms(search);
                         imagesSearchTask = new ImagesSearchTask(search, keyWords, ChatActivity.this);
                         imagesSearchTask.execute();
                     }

@@ -15,7 +15,6 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.ServerSharedConstants;
 import com.university.gualdras.tfgapp.domain.ContactItem;
-import com.university.gualdras.tfgapp.gcm.ServerComunication;
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 import com.university.gualdras.tfgapp.presentation.contactsTab.ContactTab;
 
@@ -25,9 +24,12 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -45,25 +47,47 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
         mContext = params[0];
         String data = "";
 
-        HttpURLConnection httpURLConnection = null;
+        HttpURLConnection httpUrlConnection = null;
 
         JSONObject jsonParams = processPhoneNumbers();
-
         try {
-            httpURLConnection = ServerComunication.post(Constants.USERS_URL, jsonParams, Constants.MAX_ATTEMPTS);
-            int code = httpURLConnection.getResponseCode();
-            if (code == HttpURLConnection.HTTP_OK) {
-                InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
-                data = NetworkUtils.readStream(in);
-                error = false;
+            httpUrlConnection = (HttpURLConnection) new URL(Constants.USERS_URL)
+                    .openConnection();
+
+            httpUrlConnection.setRequestMethod("PUT");
+            httpUrlConnection.setRequestProperty("Content-Type", "application/json");
+
+
+            DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream());
+
+            wr.writeBytes(jsonParams.toString());
+
+            wr.flush();
+            wr.close();
+
+
+            int responseCode = httpUrlConnection.getResponseCode();
+
+            switch (responseCode){
+                case HttpURLConnection.HTTP_OK:
+                    InputStream in = new BufferedInputStream(httpUrlConnection.getInputStream());
+                    data = NetworkUtils.readStream(in);
+                    error = false;
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
+                    break;
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (MalformedURLException exception) {
+            Log.e(TAG, "MalformedURLException");
+        } catch (IOException exception) {
+            Log.e(TAG, "IOException");
         } finally {
-            if (null != httpURLConnection)
-                httpURLConnection.disconnect();
+            if (null != httpUrlConnection)
+                httpUrlConnection.disconnect();
         }
+
         return data;
     }
 

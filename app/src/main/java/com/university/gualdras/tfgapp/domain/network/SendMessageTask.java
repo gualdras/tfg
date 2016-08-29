@@ -5,12 +5,15 @@ import android.os.AsyncTask;
 
 import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.domain.MessageItem;
-import com.university.gualdras.tfgapp.gcm.ServerComunication;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by gualdras on 7/03/16.
@@ -27,17 +30,39 @@ public class SendMessageTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        HttpURLConnection httpURLConnection = null;
-        JSONObject jsonParam = messageItem.messageToJSON();
-        String url = Constants.USERS_URL + "/" + messageItem.getTo() + Constants.SEND;
+        HttpURLConnection httpUrlConnection = null;
+        JSONObject jsonParams = messageItem.messageToJSON();
+        String url = Constants.USERS_URL + "/" + messageItem.getTo();
 
         try {
-            httpURLConnection = ServerComunication.post(url, jsonParam, Constants.MAX_ATTEMPTS);
+            httpUrlConnection = (HttpURLConnection) new URL(url)
+                    .openConnection();
+            httpUrlConnection.setRequestMethod("PUT");
+            httpUrlConnection.setRequestProperty("Content-Type", "application/json");
+
+
+            DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream());
+
+            wr.writeBytes(jsonParams.toString());
+
+            wr.flush();
+            wr.close();
+            int responseCode = httpUrlConnection.getResponseCode();
+
+            switch (responseCode){
+                case HttpURLConnection.HTTP_OK:
+                    InputStream in = new BufferedInputStream(httpUrlConnection.getInputStream());
+                    break;
+                case HttpURLConnection.HTTP_NOT_FOUND:
+                    InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
+                    break;
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (null != httpURLConnection)
-                httpURLConnection.disconnect();
+            if (null != httpUrlConnection)
+                httpUrlConnection.disconnect();
         }
 
         messageItem.saveMessageSent(mContext);

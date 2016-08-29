@@ -12,9 +12,11 @@ import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.IIndexWord;
 import edu.mit.jwi.item.ISynset;
+import edu.mit.jwi.item.ISynsetID;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
+import edu.mit.jwi.item.Pointer;
 import edu.mit.jwi.morph.WordnetStemmer;
 
 /**
@@ -29,18 +31,8 @@ public class InputProcess {
         if(input.length() > 0) {
             String[] sInput = input.split(" ");
             output = new StringBuilder();
-            URL url = null;
-            try {
-                url = new URL("file", null, Constants.PATH_TO_DICT);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            dict = new Dictionary(url);
-            try {
-                dict.open();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            getDict();
+
             for (String w : sInput) {
                 List<String> s;
 
@@ -53,23 +45,10 @@ public class InputProcess {
         return output.toString().trim();
     }
 
-    public static ArrayList<String> expandInput(String search) {
+    public static ArrayList<String> getSynonyms(String search) {
         String[] input = search.split(" ");
         ArrayList<String> synList = new ArrayList<>();
-
-        URL url = null;
-        try {
-            url = new URL("file", null, Constants.PATH_TO_DICT);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        dict = new Dictionary(url) ;
-
-        try {
-            dict.open();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        getDict();
 
         for (String w : input) {
             for (POS pos : POS.values()) {
@@ -89,5 +68,48 @@ public class InputProcess {
             }
         }
         return synList;
+    }
+    
+    public static ArrayList<String> getHypernyms(String search){
+        String[] input = search.split(" ");
+        ArrayList<String> hyperList = new ArrayList<>();
+        getDict();
+
+        for (String w : input) {
+            for (POS pos : POS.values()) {
+                IIndexWord idxWord = dict.getIndexWord(w, pos);
+                if (idxWord != null) {
+                    IWordID wordID = idxWord.getWordIDs().get(0);
+                    IWord word = dict.getWord(wordID);
+
+                    ISynset synSet = word.getSynset();
+                    List<ISynsetID> hypernyms = synSet.getRelatedSynsets(Pointer.HYPERNYM);
+                    List < IWord > words ;
+                    for (ISynsetID sid : hypernyms) {
+                        words = dict.getSynset(sid).getWords();
+                        for(IWord hyper: words){
+                            hyperList.add(hyper.getLemma());
+                        }
+                    }
+                }
+            }
+        }
+        return hyperList;
+    }
+
+    private static void getDict(){
+        URL url = null;
+        try {
+            url = new URL("file", null, Constants.PATH_TO_DICT);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        dict = new Dictionary(url) ;
+
+        try {
+            dict.open();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

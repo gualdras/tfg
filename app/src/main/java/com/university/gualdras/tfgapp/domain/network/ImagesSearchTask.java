@@ -139,7 +139,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
 
 
     public void getImagesCollaborative(String response) throws JSONException {
-        JSONArray items = JSONProcess(response, ServerSharedConstants.BLOB);
+        JSONArray items = JSONProcess(response, ServerSharedConstants.IMAGE);
         for(int i=0; i<items.length(); i++){
             JSONObject item = items.getJSONObject(i);
             suggestedImages.add(new SuggestedImage(item.getString(ServerSharedConstants.LINK), item.getString(ServerSharedConstants.BLOB), keyWords));
