@@ -17,6 +17,7 @@ public interface ServerSharedConstants {
     String BLOB = "blob";
     String TAG = "tag";
     String KEY_WORDS = "key_words";
+    String CATEGORIES = "categories";
     String LINK = "link";
     String SITE_LINK = "site_link";
     String FLICKR_TAGS = "flickr_tags";

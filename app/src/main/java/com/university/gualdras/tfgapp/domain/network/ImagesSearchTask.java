@@ -47,12 +47,13 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
     String search;
     ImageInteractionListener mListener;
     ArrayList<String> keyWords;
-
+    ArrayList<String> categories;
     ArrayList<SuggestedImage> suggestedImages = new ArrayList<>();
 
-    public ImagesSearchTask(String search, ArrayList<String> keyWords, Activity activity) {
+    public ImagesSearchTask(String search, ArrayList<String> keyWords, ArrayList<String> categories, Activity activity) {
         this.search = search;
         this.keyWords = keyWords;
+        this.categories = categories;
         this.mListener = (ImageInteractionListener) activity;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
     }
@@ -81,6 +82,9 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
         parameters.append("?" + ServerSharedConstants.USER_ID + "=" + sharedPreferences.getString(Constants.PHONE_NUMBER, ""));
         for(String keyWord: keyWords){
             parameters.append("&" + ServerSharedConstants.KEY_WORDS + "=" +keyWord);
+        }
+        for(String category: categories){
+            parameters.append("&" + ServerSharedConstants.CATEGORIES + "=" + category);
         }
         try {
             String url = Constants.IMAGES_URL + parameters.toString();
@@ -182,7 +186,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
         List<Result> results = searchGSE(null);
 
         if(results != null) {
-            while (suggestedImages.size() < ServerSharedConstants.NUMBER_OF_IMAGES) {
+            while (suggestedImages.size() < ServerSharedConstants.NUMBER_OF_IMAGES && results.size() > 0) {
                 SuggestedImage suggestedImage = new SuggestedImage(results.remove(0), keyWords);
                 if (!suggestedImages.contains(suggestedImage)) suggestedImages.add(suggestedImage);
             }
