@@ -66,7 +66,6 @@ public class WriteMessageFragment extends Fragment {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Todo - change destinatary
                 if (mEditText.getText().toString().trim().length() != 0) {
                     MessageItem messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), ((ChatActivity)getActivity()).getContactNumber(), MessageItem.TEXT_TYPE, mEditText.getText().toString());
                     ChatActivity.sendMessage(messageItem);

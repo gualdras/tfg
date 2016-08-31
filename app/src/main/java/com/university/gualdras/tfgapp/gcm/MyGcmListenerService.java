@@ -32,7 +32,6 @@ public class MyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String senderID, Bundle data) {
-        //TODO wakelock
         String from = data.getString(ServerSharedConstants.FROM);
         String type = data.getString(ServerSharedConstants.TYPE);
         String msg = data.getString(ServerSharedConstants.MSG);
@@ -53,7 +52,6 @@ public class MyGcmListenerService extends GcmListenerService {
     // [END receive_message]
 
     private void sendNotification(String msg) {
-        //TODO
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,

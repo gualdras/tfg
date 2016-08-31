@@ -35,7 +35,6 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
                 new String[]{DataProvider.COL_MSG, DataProvider.COL_MSG, DataProvider.COL_AT, DataProvider.COL_TYPE},
                 new int[]{R.id.msg, R.id.img, R.id.time},
                 0);
-        //Todo Try to do the date visualization automatically
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
 
             @Override
