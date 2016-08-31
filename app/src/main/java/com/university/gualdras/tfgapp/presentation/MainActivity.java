@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     final int[] ICONS_SELECTED_TABS = {R.drawable.ic_settings_yellow, R.drawable.ic_contacts_yellow, R.drawable.ic_recent_chats_yellow};
     final int[] NAME_TABS = {R.string.settings_tab, R.string.contacts_tab, R.string.recent_chats_tab};
 
-    private static final String TAG = "MainActivity";
 
     SharedPreferences sharedPreferences;
     private static Context mContext;

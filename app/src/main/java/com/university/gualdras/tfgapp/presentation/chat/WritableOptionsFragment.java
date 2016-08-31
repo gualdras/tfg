@@ -9,10 +9,6 @@ import android.widget.ImageButton;
 
 import com.university.gualdras.tfgapp.R;
 
-/**
- * Created by gualdras on 12/10/15.
- */
-
 public class WritableOptionsFragment extends Fragment {
 
     private ImageButton writeMsgBtn, selectImageBtn, speechRecognitionBtn;
@@ -40,14 +36,7 @@ public class WritableOptionsFragment extends Fragment {
                 ((ChatActivity)getActivity()).onWriteMsgSelection();
             }
         });
-/*        selectImageBtn = (ImageButton) getActivity().findViewById(R.id.select_image_btn);
-        selectImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((ChatActivity)getActivity()).onImgSelection();
-            }
-        });
-        */
+
         speechRecognitionBtn = (ImageButton) getActivity().findViewById(R.id.speech_recognition_btn);
         speechRecognitionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,5 +44,15 @@ public class WritableOptionsFragment extends Fragment {
                 ((ChatActivity)getActivity()).onSpeechRecognitionSelection();
             }
         });
+
+        /*
+        selectImageBtn = (ImageButton) getActivity().findViewById(R.id.select_image_btn);
+        selectImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((ChatActivity)getActivity()).onImgSelection();
+            }
+        });
+        */
     }
 }

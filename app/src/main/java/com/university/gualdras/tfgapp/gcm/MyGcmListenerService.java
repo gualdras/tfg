@@ -16,10 +16,6 @@ import com.university.gualdras.tfgapp.domain.network.ReceivedImageDownloadTask;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 import com.university.gualdras.tfgapp.presentation.MainActivity;
 
-/**
- * Created by gualdras on 5/10/15.
- */
-
 
 public class MyGcmListenerService extends GcmListenerService {
 

@@ -6,9 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-/**
- * Created by gualdras on 10/05/16.
- */
+
 public class Utils {
     public static String getRealPathFromURI(Context mContext, Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };

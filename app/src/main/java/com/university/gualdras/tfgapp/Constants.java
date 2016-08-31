@@ -2,13 +2,10 @@ package com.university.gualdras.tfgapp;
 
 import android.os.Environment;
 
-/**
- * Created by gualdras on 25/09/15.
- */
+
 public interface Constants {
 
     public static final String EXTRA_CONTACT_ID = "ExtraContactId";
-    public static final String EXTRA_PHOTO_PROFILE = "ExtraPhotoProfile";
 
     //preferences
 

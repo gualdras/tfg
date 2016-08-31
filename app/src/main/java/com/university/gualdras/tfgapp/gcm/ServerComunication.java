@@ -10,9 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
 
-/**
- * Created by gualdras on 13/02/16.
- */
+
 public class ServerComunication {
     private static final int BACKOFF_MILLI_SECONDS = 2000;
     private static final Random random = new Random();
@@ -42,8 +40,6 @@ public class ServerComunication {
         }
         return httpURLConnection;
     }
-
-    //Todo: Implement incremental backoff post
 
     public static HttpURLConnection post(String url, JSONObject jsonParams, int maxAttempts) throws IOException {
         boolean cont = true;

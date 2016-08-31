@@ -11,10 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-/**
- * @author appsrox.com
- *
- */
 public class DataProvider extends ContentProvider {
 	
 	public static final Uri CONTENT_URI_MESSAGES = Uri.parse("content://com.university.gualdras.tfgapp.provider/messages");

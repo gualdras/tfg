@@ -20,11 +20,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 
-/**
- * Created by gualdras on 5/10/15.
- */
-
-
 public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = "RegIntentService";

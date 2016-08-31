@@ -1,8 +1,6 @@
 package com.university.gualdras.tfgapp;
 
-/**
- * Created by gualdras on 9/02/16.
- */
+
 public interface ServerSharedConstants {
     String FROM = "phoneNumberFrom";
     String MSG = "message";
@@ -20,7 +18,6 @@ public interface ServerSharedConstants {
     String CATEGORIES = "categories";
     String LINK = "link";
     String SITE_LINK = "site_link";
-    String FLICKR_TAGS = "flickr_tags";
 
     int NUMBER_OF_IMAGES = 10;
 }

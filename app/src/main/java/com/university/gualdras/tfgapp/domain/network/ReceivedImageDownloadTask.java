@@ -19,9 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by gualdras on 29/03/16.
- */
+
 public class ReceivedImageDownloadTask extends AsyncTask<Void, Void, String> {
     private static final String TAG = "ImageDownload";
     Context mContext;

@@ -1,15 +1,11 @@
 package com.university.gualdras.tfgapp.domain.network;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * Created by gualdras on 24/04/16.
- */
+
 public class NetworkUtils {
     public static String readStream(InputStream in) {
         BufferedReader reader = null;

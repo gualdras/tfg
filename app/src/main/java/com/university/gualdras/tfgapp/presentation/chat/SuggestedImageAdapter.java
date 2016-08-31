@@ -13,9 +13,7 @@ import com.university.gualdras.tfgapp.domain.SuggestedImage;
 
 import java.util.ArrayList;
 
-/**
- * Created by gualdras on 12/05/16.
- */
+
 class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.ViewHolder> {
 
     ArrayList<SuggestedImage> sugestedImages;
@@ -32,10 +30,8 @@ class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.V
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        // Inflate the custom layout
         View contactView = inflater.inflate(R.layout.image, parent, false);
 
-        // Return a new holder instanceD
         ViewHolder viewHolder = new ViewHolder(contactView, new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -51,7 +47,6 @@ class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.V
     public void onBindViewHolder(ViewHolder holder, int position) {
         Bitmap image = sugestedImages.get(position).getBitmap();
 
-        // Set item views based on the data model
         ImageView imageView = holder.imageView;
         imageView.setImageBitmap(image);
     }
@@ -73,16 +68,10 @@ class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.V
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        // Your holder should contain a member variable
-        // for any view that will be set as you render a row
         public ImageView imageView;
         public OnItemClickListener mListener;
 
-        // We also create a constructor that accepts the entire item row
-        // and does the view lookups to find each subview
         public ViewHolder(View itemView, OnItemClickListener listener) {
-            // Stores the itemView in a public final member variable that can be used
-            // to access the context from any ViewHolder instance.
             super(itemView);
             mListener = listener;
 
@@ -98,7 +87,7 @@ class SuggestedImageAdapter extends RecyclerView.Adapter<SuggestedImageAdapter.V
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
 }

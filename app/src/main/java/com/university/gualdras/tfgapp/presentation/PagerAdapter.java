@@ -1,8 +1,6 @@
 package com.university.gualdras.tfgapp.presentation;
 
-/**
- * Created by gualdras on 19/09/15.
- */
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;

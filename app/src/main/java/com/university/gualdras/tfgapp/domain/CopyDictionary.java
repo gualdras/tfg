@@ -3,10 +3,8 @@ package com.university.gualdras.tfgapp.domain;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.university.gualdras.tfgapp.Constants;
-import com.university.gualdras.tfgapp.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,14 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * Created by gualdras on 14/08/16.
- */
+
 public class CopyDictionary extends AsyncTask <Void, Void, Void> {
 
     AssetManager am;
     Context mContext;
-    //String PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/tfg/dict/";
 
     public CopyDictionary(AssetManager am, Context mContext) {
         this.am = am;
@@ -31,9 +26,7 @@ public class CopyDictionary extends AsyncTask <Void, Void, Void> {
     @Override
     protected Void doInBackground(Void ...params) {
         String directory = "dict";
-        //copyFileOrDir(directory);
         copyFileOrDir(directory);
-
         return null;
     }
 
@@ -77,11 +70,5 @@ public class CopyDictionary extends AsyncTask <Void, Void, Void> {
             out.close();
         } catch (Exception e) {
         }
-
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        Toast.makeText(mContext, R.string.progress_copying_dictionary, Toast.LENGTH_SHORT).show();
     }
 }

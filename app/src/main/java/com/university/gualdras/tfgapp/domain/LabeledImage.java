@@ -2,9 +2,7 @@ package com.university.gualdras.tfgapp.domain;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by gualdras on 23/04/16.
- */
+
 public class LabeledImage {
     Bitmap image;
     String labels;

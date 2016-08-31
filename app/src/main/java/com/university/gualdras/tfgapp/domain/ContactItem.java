@@ -5,9 +5,7 @@ import android.content.Context;
 
 import com.university.gualdras.tfgapp.persistence.DataProvider;
 
-/**
- * Created by gualdras on 20/09/15.
- */
+
 
 public class ContactItem {
 
@@ -17,7 +15,6 @@ public class ContactItem {
 
     public ContactItem() {
     }
-
 
     public ContactItem(String photoProfile, String contactName) {
         this.photoProfile = photoProfile;

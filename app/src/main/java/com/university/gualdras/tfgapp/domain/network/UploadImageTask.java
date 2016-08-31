@@ -29,12 +29,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * Created by gualdras on 9/03/16.
- */
+
 public class UploadImageTask extends AsyncTask<Void, Void, String> {
 
-    private static final String ITEMS_TAG = "items";
     private static final String TAG = "ImageUpload";
 
     Context mContext;
@@ -57,7 +54,6 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
             suggestedImage.setBlobUrl(imgURL);
             putImageInformation();
         }
-
         return imgURL;
     }
 
@@ -68,7 +64,6 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
         try {
             httpUrlConnection = (HttpURLConnection) new URL(Constants.UPLOAD_FORM_URL)
                     .openConnection();
-
             switch (httpUrlConnection.getResponseCode()){
                 case HttpURLConnection.HTTP_OK:
                     InputStream in = new BufferedInputStream(
@@ -78,11 +73,9 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
                     InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
-
                     blobUrl = NetworkUtils.readStream(err);
                     break;
             }
-
         } catch (MalformedURLException exception) {
             Log.e(TAG, "MalformedURLException");
         } catch (IOException exception) {
@@ -91,7 +84,6 @@ public class UploadImageTask extends AsyncTask<Void, Void, String> {
             if (null != httpUrlConnection)
                 httpUrlConnection.disconnect();
         }
-
         return blobUrl;
     }
 

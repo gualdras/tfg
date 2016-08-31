@@ -1,8 +1,5 @@
 package com.university.gualdras.tfgapp.presentation.contactsTab;
 
-/**
- * Created by gualdras on 19/09/15.
- */
 
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +36,6 @@ public class ContactTab extends ListFragment implements LoaderManager.LoaderCall
 
     String TAG = "contactTab";
     private Context mContext;
-    //private ContactListAdapter contactListAdapter;
 
     private SimpleCursorAdapter adapter;
     static MenuItem refreshContactMenu;

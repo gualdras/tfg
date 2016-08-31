@@ -18,9 +18,7 @@ import com.university.gualdras.tfgapp.Constants;
 import com.university.gualdras.tfgapp.R;
 import com.university.gualdras.tfgapp.domain.MessageItem;
 
-/**
- * Created by gualdras on 12/10/15.
- */
+
 public class WriteMessageFragment extends Fragment {
 
     EditText mEditText;

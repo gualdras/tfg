@@ -15,9 +15,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by gualdras on 7/03/16.
- */
 public class SendMessageTask extends AsyncTask<Void, Void, Void> {
 
     MessageItem messageItem;

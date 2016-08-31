@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by gualdras on 22/04/16.
- */
+
 public class ImageLabelDetectionTask extends AsyncTask<Void, Void, SuggestedImage> {
     private static final String TAG = "ImageFilter";
     private static final String CLOUD_VISION_API_KEY = "AIzaSyCHiOSu8pudqXgYKpzJRNnIBQLhHlFb07g";

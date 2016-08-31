@@ -7,14 +7,11 @@ import com.google.api.services.customsearch.model.Result;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by gualdras on 27/05/16.
- */
+
 public class SuggestedImage {
     String blobUrl;
     String link;
     String siteLink;
-    String[] flickrTags;
     Bitmap bitmap;
     String path;
     HashMap<String, Float> tags;
@@ -24,14 +21,6 @@ public class SuggestedImage {
     public SuggestedImage(String link, String siteLink, Bitmap bitmap, String path) {
         this.link = link;
         this.siteLink = siteLink;
-        this.bitmap = bitmap;
-        this.path = path;
-    }
-
-    public SuggestedImage(String link, String siteLink, String[] flickrTags, Bitmap bitmap, String path) {
-        this.link = link;
-        this.siteLink = siteLink;
-        this.flickrTags = flickrTags;
         this.bitmap = bitmap;
         this.path = path;
     }
@@ -70,14 +59,6 @@ public class SuggestedImage {
 
     public void setSiteLink(String siteLink) {
         this.siteLink = siteLink;
-    }
-
-    public String[] getFlickrTags() {
-        return flickrTags;
-    }
-
-    public void setFlickrTags(String[] flickrTags) {
-        this.flickrTags = flickrTags;
     }
 
     public Bitmap getBitmap() {

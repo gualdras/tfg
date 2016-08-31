@@ -9,9 +9,7 @@ import com.university.gualdras.tfgapp.persistence.DataProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by gualdras on 11/10/15.
- */
+
 public class MessageItem {
 
     private String from, to, type, msg, localResource;

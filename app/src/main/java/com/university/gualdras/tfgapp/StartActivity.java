@@ -5,9 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 
-/**
- * Created by gualdras on 9/02/16.
- */
+
 public class StartActivity extends Application {
 
     @Override

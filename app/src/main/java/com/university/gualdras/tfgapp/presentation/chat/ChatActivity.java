@@ -45,9 +45,6 @@ import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-/**
- * Created by gualdras on 22/09/15.
- */
 public class ChatActivity extends AppCompatActivity implements ImageInteractionListener {
 
     private int SPEECH_CODE = 2134;
@@ -119,18 +116,14 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         mFrameLayout = (FrameLayout) findViewById(R.id.fragment_container);
 
         if(savedInstanceState == null) {
-            // Get a reference to the FragmentManager
             mFragmentManager = getFragmentManager();
 
-            // Start a new FragmentTransaction
             FragmentTransaction fragmentTransaction = mFragmentManager
                     .beginTransaction();
 
-            // Add the TitleFragment to the layout
             fragmentTransaction.add(R.id.fragment_container, mWritableOptions);
             fragmentTransaction.addToBackStack(null);
 
-            // Commit the FragmentTransaction
             fragmentTransaction.commit();
         }
     }
@@ -146,14 +139,11 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
 
             mFragmentManager = getFragmentManager();
 
-            // Start a new FragmentTransaction
             FragmentTransaction fragmentTransaction = mFragmentManager
                     .beginTransaction();
 
-            // Add the TitleFragment to the layout
             fragmentTransaction.replace(R.id.fragment_container, mWritableOptions);
 
-            // Commit the FragmentTransaction
             fragmentTransaction.commit();
 
 
@@ -168,19 +158,15 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
 
    public void onWriteMsgSelection() {
 
-        // Get a reference to the FragmentManager
         mFragmentManager = getFragmentManager();
 
-        // Start a new FragmentTransaction
         FragmentTransaction fragmentTransaction = mFragmentManager
                 .beginTransaction();
 
-        // Add the TitleFragment to the layout
         fragmentTransaction.remove(mWritableOptions);
         fragmentTransaction.add(R.id.fragment_container, mWriteMessage);
         fragmentTransaction.addToBackStack(null);
 
-        // Commit the FragmentTransaction
         fragmentTransaction.commit();
         mFragmentManager.executePendingTransactions();
     }
@@ -192,17 +178,18 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().getDisplayLanguage());
         startActivityForResult(speechIntent, SPEECH_CODE);
     }
+
     /*
+    Method to handle send images that are stored locally
     public void onImgSelection(){
             Intent chooserIntent = new Intent(Intent.ACTION_PICK,
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
             startActivityForResult(chooserIntent, PICK_IMAGE_CODE);
-    }
-    */
+    } */
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        MessageItem messageItem;
         if(requestCode == SPEECH_CODE){
             if(resultCode == RESULT_OK){
                 String text;
@@ -210,10 +197,6 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
                 text = words.get(0);
                 onWriteMsgSelection();
                 mWriteMessage.changeText(text);
-                //onTextChangedListener(msg);
-                /*messageItem = new MessageItem(sharedPreferences.getString(Constants.PHONE_NUMBER, ""), contactPhoneNumber, MessageItem.TEXT_TYPE, msg);
-                sendMessage(messageItem);
-                */
             } else{
                 Toast.makeText(this, R.string.not_understood, Toast.LENGTH_SHORT).show();
             }
@@ -283,7 +266,7 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
     }
 
     //--------------------------------------------------------------------------------------------------------------//
-    //Return suggestedImages instead of Results
+
     @Override
     public void onImageSearchCompleted(ArrayList<SuggestedImage> suggestedImages, ArrayList<String> keyWords) {
         SuggestedImage suggestedImage;
@@ -296,7 +279,6 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         }
     }
 
-    //--------------------------------------------------------------------------------------------------------------//
 
     @Override
     public void onSuggestedImageDownloadFinish(SuggestedImage suggestedImage) {
@@ -355,32 +337,3 @@ public class ChatActivity extends AppCompatActivity implements ImageInteractionL
         }
     }
 }
-
-/*@Override
-    public void onWriteMsgSelection() {
-        Intent intent = new Intent(this, KK.class);
-        startActivity(intent);
-    }*/
-
-    /*
-        public void onImgSelection() {
-            mFragmentManager = getFragmentManager();
-
-            // Start a new FragmentTransaction
-            FragmentTransaction fragmentTransaction = mFragmentManager
-                    .beginTransaction();
-
-            fragmentTransaction.remove(mWritableOptions);
-            // Add the TitleFragment to the layout
-            fragmentTransaction.add(R.id.fragment_container, mGallery);
-            fragmentTransaction.addToBackStack(null);
-
-            // Commit the FragmentTransaction
-            fragmentTransaction.commit();
-
-            mFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
-            mFragmentManager.executePendingTransactions();
-        }
-    */
-

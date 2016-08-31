@@ -21,9 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by gualdras on 19/08/16.
- */
 public class CheckImageDatastoreTask extends AsyncTask<Void, Void, Void> {
 
     private static final String TAG = "CheckImageDatastore";
@@ -52,7 +49,7 @@ public class CheckImageDatastoreTask extends AsyncTask<Void, Void, Void> {
                     InputStream in = new BufferedInputStream(
                             httpUrlConnection.getInputStream());
 
-                    String blob = JSONProcess(readStream(in));
+                    String blob = JSONProcess(NetworkUtils.readStream(in));
 
                     suggestedImage.setBlobUrl(blob);
 

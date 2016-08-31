@@ -32,9 +32,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-/**
- * Created by gualdras on 6/03/16.
- */
 
 public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
 
@@ -57,14 +54,10 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             httpUrlConnection.setRequestMethod("PUT");
             httpUrlConnection.setRequestProperty("Content-Type", "application/json");
 
-
             DataOutputStream wr = new DataOutputStream(httpUrlConnection.getOutputStream());
-
             wr.writeBytes(jsonParams.toString());
-
             wr.flush();
             wr.close();
-
 
             int responseCode = httpUrlConnection.getResponseCode();
 
@@ -78,7 +71,6 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
                     InputStream err = new BufferedInputStream(httpUrlConnection.getErrorStream());
                     break;
             }
-
         } catch (MalformedURLException exception) {
             Log.e(TAG, "MalformedURLException");
         } catch (IOException exception) {
@@ -87,7 +79,6 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             if (null != httpUrlConnection)
                 httpUrlConnection.disconnect();
         }
-
         return data;
     }
 
@@ -101,14 +92,12 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
 
     private void updateContacts(String response) {
         ArrayList<ContactItem> newContacts = JSONProcess(response);
-
         for (ContactItem contact : newContacts) {
             contact.saveContact(mContext);
         }
     }
 
     private JSONObject processPhoneNumbers(){
-
         String contactId, completeNumber;
 
         ArrayList<String> contactsAlreadyChecked = new ArrayList<>();
@@ -178,7 +167,6 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
         } catch (JSONException e) {
             Log.d(TAG, e.toString());
         }
-
         return jsonParams;
     }
 
@@ -198,7 +186,6 @@ public class RefreshContactsTask extends AsyncTask<Context, Void, String> {
             for (int i = 0; i < contacts.length(); i++) {
 
                 JSONObject c = contacts.getJSONObject(i);
-
                 phoneNumber = c.getString(ServerSharedConstants.PHONE_NUMBER);
 
                 Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));

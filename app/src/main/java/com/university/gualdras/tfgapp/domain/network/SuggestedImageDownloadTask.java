@@ -16,9 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by gualdras on 10/05/16.
- */
 public class SuggestedImageDownloadTask extends AsyncTask<Void, Void, SuggestedImage> {
     private static final String TAG = "ImageDownload";
 
@@ -32,7 +29,7 @@ public class SuggestedImageDownloadTask extends AsyncTask<Void, Void, SuggestedI
 
     @Override
     protected SuggestedImage doInBackground(Void... params) {
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         HttpURLConnection httpUrlConnection = null;
         if (suggestedImage.getBlobUrl() != null) {
             try {

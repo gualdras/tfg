@@ -19,9 +19,7 @@ import edu.mit.jwi.item.POS;
 import edu.mit.jwi.item.Pointer;
 import edu.mit.jwi.morph.WordnetStemmer;
 
-/**
- * Created by gualdras on 15/08/16.
- */
+
 public class InputProcess {
 
     static IDictionary dict;

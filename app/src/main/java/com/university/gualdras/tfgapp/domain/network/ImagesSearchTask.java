@@ -32,9 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by gualdras on 17/04/16.
- */
+
 public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "ImagesSearch";
 
@@ -66,11 +64,6 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        /*
-        if(searchResults != null){
-            mListener.onImageSearchCompleted(searchResults, keyWords);
-        }
-        */
         if(suggestedImages != null){
             mListener.onImageSearchCompleted(suggestedImages, keyWords);
         }
@@ -100,7 +93,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
                     InputStream in = new BufferedInputStream(
                             httpUrlConnection.getInputStream());
 
-                    String response = readStream(in);
+                    String response = NetworkUtils.readStream(in);
 
                     getImagesCollaborative(response);
                     getImagesContentBased(response);
@@ -122,25 +115,6 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
                 httpUrlConnection.disconnect();
         }
     }
-
-/*    private ArrayList<String> JSONProcess (String response, String tag){
-        ArrayList<String> result = new ArrayList<>();
-        try {
-            JSONObject responseObject = (JSONObject) new JSONTokener(
-                    response).nextValue();
-
-            JSONArray items = responseObject
-                    .getJSONArray(tag);
-
-            for(int i=0; i<items.length(); i++){
-                result.add(items.getString(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }*/
-
 
     public void getImagesCollaborative(String response) throws JSONException {
         JSONArray items = JSONProcess(response, ServerSharedConstants.IMAGE);
@@ -175,8 +149,7 @@ public class ImagesSearchTask extends AsyncTask<Void, Void, Void> {
             JSONObject responseObject = (JSONObject) new JSONTokener(
                     response).nextValue();
 
-            items = responseObject
-                    .getJSONArray(tag);
+            items = responseObject.getJSONArray(tag);
         return items;
     }
 

@@ -67,10 +67,6 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
                             imageView.setImageBitmap(bitmap);
                             return true;
                         }
-                    /*case R.id.time:
-                        TextView tv = (TextView) view;
-                        tv.setText(getDisplayTime(cursor.getString(columnIndex)));
-                        return true;*/
                 }
                 return false;
             }
@@ -129,7 +125,6 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
         options.inSampleSize = calculateInSampleSize(options, reqWidth,
                 reqHeight);
 
-// Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         Bitmap bmp = BitmapFactory.decodeFile(path, options);
         return bmp;

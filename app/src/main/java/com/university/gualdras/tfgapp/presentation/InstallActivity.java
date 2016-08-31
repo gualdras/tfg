@@ -29,9 +29,7 @@ import com.university.gualdras.tfgapp.domain.CopyDictionary;
 import com.university.gualdras.tfgapp.gcm.Preferences;
 import com.university.gualdras.tfgapp.gcm.RegistrationIntentService;
 
-/**
- * Created by gualdras on 28/02/16.
- */
+
 public class InstallActivity extends AppCompatActivity{
 
     private static final String TAG = "InstallActivity";
@@ -143,10 +141,10 @@ public class InstallActivity extends AppCompatActivity{
     private void registrationIntent(){
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
-            //if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
-            Intent intent = new Intent(this, RegistrationIntentService.class);
-            startService(intent);
-            //}
+            if(!sharedPreferences.getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false)){
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
         }
     }
 
@@ -165,8 +163,6 @@ public class InstallActivity extends AppCompatActivity{
         }
         return true;
     }
-
-    //Todo: Check also if there is microphone
 
     private int getDefaultCountryCodePosition(Spinner countryCodes){
         ArrayAdapter adapter = (ArrayAdapter) countryCodes.getAdapter();
