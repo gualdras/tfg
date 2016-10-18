@@ -19,5 +19,5 @@ public interface ServerSharedConstants {
     String LINK = "link";
     String SITE_LINK = "site_link";
 
-    int NUMBER_OF_IMAGES = 10;
+    int NUMBER_OF_IMAGES = 6;
 }
